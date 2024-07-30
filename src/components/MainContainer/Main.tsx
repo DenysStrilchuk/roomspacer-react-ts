@@ -1,9 +1,12 @@
+// components/MainContainer/Main.tsx
+import React from 'react';
+
 const Main = () => {
     return (
         <div>
-            Main
+            <h2>Main Page</h2>
         </div>
     );
 };
 
-export {Main};
+export { Main };

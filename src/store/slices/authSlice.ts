@@ -1,8 +1,9 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { AxiosError } from "axios";
+// store/slices/authSlice.ts
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 
-import { authService } from "../../services/authService";
-import { IUser } from "../../interfaces/userInterface";
+import { authService } from '../../services/authService';
+import { IUser } from '../../interfaces/userInterface';
 
 interface IAuthState {
     user: IUser | null;
@@ -51,7 +52,7 @@ const authSlice = createSlice({
         logout: (state) => {
             state.user = null;
             state.token = null;
-        }
+        },
     },
     extraReducers: builder => {
         builder
