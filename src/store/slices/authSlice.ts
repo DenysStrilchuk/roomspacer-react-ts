@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 
-import { authService } from "../../services";
+import { authService } from "../../services/authService";
 import { IUser } from "../../interfaces/userInterface";
 
 interface IAuthState {
@@ -20,9 +20,9 @@ const initialState: IAuthState = {
 
 const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string }>(
     'authSlice/login',
-    async (credentials, { rejectWithValue }) => {
+    async ({ email, password }, { rejectWithValue }) => {
         try {
-            const { data } = await authService.login(credentials);
+            const data = await authService.login(email, password);
             return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError;
@@ -33,9 +33,9 @@ const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, 
 
 const register = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string, name: string }>(
     'authSlice/register',
-    async (userInfo, { rejectWithValue }) => {
+    async ({ email, password, name }, { rejectWithValue }) => {
         try {
-            const { data } = await authService.register(userInfo);
+            const data = await authService.register(email, password, name);
             return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError;
