@@ -1,5 +1,5 @@
-import axios, {AxiosError} from "axios";
-import {baseURL, urls} from "../constants";
+import axios, { AxiosError } from 'axios';
+import { baseURL, urls } from '../constants';
 
 const register = async (email: string, password: string, name: string) => {
     try {
@@ -10,24 +10,36 @@ const register = async (email: string, password: string, name: string) => {
         if (error instanceof AxiosError) {
             console.error('Axios error:', error);
             console.error('Server error data:', error.response?.data);
+            throw error.response?.data || { message: 'Registration failed' };
         } else {
             console.error('Unexpected error:', error);
+            throw { message: 'Unexpected error occurred' };
         }
-        throw error;
     }
 };
 
 const login = async (email: string, password: string) => {
-    const url = `${baseURL}${urls.login.base}`;
-    const response = await axios.post(url, { email, password });
-    return response.data;
+    try {
+        const url = `${baseURL}${urls.login.base}`;
+        const response = await axios.post(url, { email, password });
+        return response.data;
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            console.error('Axios error:', error);
+            console.error('Server error data:', error.response?.data);
+            throw error.response?.data || { message: 'Login failed' };
+        } else {
+            console.error('Unexpected error:', error);
+            throw { message: 'Unexpected error occurred' };
+        }
+    }
 };
 
 const authService = {
     register,
-    login
-}
+    login,
+};
 
 export {
-    authService
-}
+    authService,
+};

@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import {authActions, RootState} from "../../store";
-import {useAppDispatch} from "../../hooks";
-import {useNavigate} from "react-router-dom";
+import { authActions, RootState } from '../../store';
+import { useAppDispatch } from '../../hooks';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const dispatch = useAppDispatch();

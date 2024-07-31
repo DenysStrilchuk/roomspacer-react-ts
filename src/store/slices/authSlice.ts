@@ -1,8 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 
-import {authService} from "../../services";
-import {IUser} from "../../interfaces";
+import { authService } from '../../services';
+import { IUser } from '../../interfaces';
+
+// Інтерфейс для обробки помилок
+interface IErrorResponse {
+    message: string;
+}
 
 interface IAuthState {
     user: IUser | null;
@@ -29,9 +34,8 @@ const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, 
             const data = await authService.login(email, password);
             return { user: data.user, token: data.token };
         } catch (e) {
-            const err = e as AxiosError;
-            console.error('Login error:', err.response?.data);
-            return rejectWithValue(err.response?.data || 'Login failed');
+            const err = e as AxiosError<IErrorResponse>;
+            return rejectWithValue(err.response?.data.message || 'Login failed');
         }
     }
 );
@@ -41,11 +45,10 @@ const register = createAsyncThunk<{ user: IUser, token: string }, { email: strin
     async ({ email, password, name }, { rejectWithValue }) => {
         try {
             const data = await authService.register(email, password, name);
-            return { user: data.user, token: data.token, message: data.message };
+            return { user: data.user, token: data.token };
         } catch (e) {
-            const err = e as AxiosError;
-            console.error('Registration error:', err.response?.data); // Лог для помилки реєстрації
-            return rejectWithValue(err.response?.data || 'Registration failed');
+            const err = e as AxiosError<IErrorResponse>;
+            return rejectWithValue(err.response?.data.message || 'Registration failed');
         }
     }
 );
@@ -59,7 +62,7 @@ const authSlice = createSlice({
             state.token = null;
         },
     },
-    extraReducers: builder => {
+    extraReducers: (builder) => {
         builder
             .addCase(login.pending, (state) => {
                 state.loading = true;
@@ -93,17 +96,17 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.isRegistered = false;
             });
-    }
+    },
 });
 
 const { reducer: authReducer, actions } = authSlice;
 const authActions = {
     ...actions,
     login,
-    register
+    register,
 };
 
 export {
     authReducer,
-    authActions
+    authActions,
 };
