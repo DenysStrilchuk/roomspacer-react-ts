@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useSelector } from 'react-redux';
 import {authActions, RootState} from "../../store";
 import {useAppDispatch} from "../../hooks";
+import {useNavigate} from "react-router-dom";
 
 const Login = () => {
     const dispatch = useAppDispatch();
-    const { loading, error } = useSelector((state: RootState) => state.auth);
+    const navigate = useNavigate();
+    const { isLogin, loading, error } = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -13,6 +15,12 @@ const Login = () => {
         e.preventDefault();
         dispatch(authActions.login({ email, password }));
     };
+
+    useEffect(() => {
+        if (isLogin) {
+            navigate('/main');
+        }
+    }, [isLogin, navigate]);
 
     return (
         <div>

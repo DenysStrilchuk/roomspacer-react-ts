@@ -10,6 +10,7 @@ interface IAuthState {
     loading: boolean;
     error: string | null;
     isRegistered: boolean;
+    isLogin: boolean;
 }
 
 const initialState: IAuthState = {
@@ -18,6 +19,7 @@ const initialState: IAuthState = {
     loading: false,
     error: null,
     isRegistered: false,
+    isLogin: false,
 };
 
 const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string }>(
@@ -62,15 +64,18 @@ const authSlice = createSlice({
             .addCase(login.pending, (state) => {
                 state.loading = true;
                 state.error = null;
+                state.isLogin = false;
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.user = action.payload.user;
                 state.token = action.payload.token;
                 state.loading = false;
+                state.isLogin = true;
             })
             .addCase(login.rejected, (state, action) => {
                 state.error = action.payload as string;
                 state.loading = false;
+                state.isLogin = false;
             })
             .addCase(register.pending, (state) => {
                 state.loading = true;
