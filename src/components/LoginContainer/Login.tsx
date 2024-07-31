@@ -1,9 +1,7 @@
-// components/LoginContainer/Login.tsx
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { authActions } from '../../store/slices/authSlice';
-import { RootState } from '../../store/store';
-import { useAppDispatch } from '../../hooks/useAppDispatch';
+import {authActions, RootState} from "../../store";
+import {useAppDispatch} from "../../hooks";
 
 const Login = () => {
     const dispatch = useAppDispatch();

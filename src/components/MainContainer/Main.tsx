@@ -1,4 +1,3 @@
-// components/MainContainer/Main.tsx
 import React from 'react';
 
 const Main = () => {
