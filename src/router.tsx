@@ -9,9 +9,9 @@ const router = createBrowserRouter([
     {
         path: '', element: <MainLayout />, children: [
             { path: '', element: <LoginPage /> },
-            { path: 'login', element: <LoginPage /> },
-            { path: 'register', element: <RegisterPage /> },
-            { path: 'chat', element: <MainPage /> },
+            { path: 'auth/login', element: <LoginPage /> },
+            { path: 'auth/register', element: <RegisterPage /> },
+            { path: 'main', element: <MainPage /> },
         ],
     },
 ]);

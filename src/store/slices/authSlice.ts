@@ -1,4 +1,3 @@
-// store/slices/authSlice.ts
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 
@@ -27,6 +26,7 @@ const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, 
             return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError;
+            console.error('Login error:', err.response?.data); // Лог для помилки логіну
             return rejectWithValue(err.response?.data || 'Login failed');
         }
     }
@@ -40,6 +40,7 @@ const register = createAsyncThunk<{ user: IUser, token: string }, { email: strin
             return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError;
+            console.error('Registration error:', err.response?.data); // Лог для помилки реєстрації
             return rejectWithValue(err.response?.data || 'Registration failed');
         }
     }

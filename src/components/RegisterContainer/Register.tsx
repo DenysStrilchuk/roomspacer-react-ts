@@ -1,4 +1,3 @@
-// components/RegisterContainer/Register.tsx
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { authActions } from '../../store/slices/authSlice';
@@ -14,6 +13,7 @@ const Register = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('Registering with:', { email, password, name }); // Лог даних форми
         dispatch(authActions.register({ email, password, name }));
     };
 
