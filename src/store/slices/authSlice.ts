@@ -9,6 +9,7 @@ interface IAuthState {
     token: string | null;
     loading: boolean;
     error: string | null;
+    isRegistered: boolean;
 }
 
 const initialState: IAuthState = {
@@ -16,6 +17,7 @@ const initialState: IAuthState = {
     token: null,
     loading: false,
     error: null,
+    isRegistered: false,
 };
 
 const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string }>(
@@ -26,7 +28,7 @@ const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, 
             return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError;
-            console.error('Login error:', err.response?.data); // Лог для помилки логіну
+            console.error('Login error:', err.response?.data);
             return rejectWithValue(err.response?.data || 'Login failed');
         }
     }
@@ -73,15 +75,18 @@ const authSlice = createSlice({
             .addCase(register.pending, (state) => {
                 state.loading = true;
                 state.error = null;
+                state.isRegistered = false;
             })
             .addCase(register.fulfilled, (state, action) => {
                 state.user = action.payload.user;
                 state.token = action.payload.token;
                 state.loading = false;
+                state.isRegistered = true;
             })
             .addCase(register.rejected, (state, action) => {
                 state.error = action.payload as string;
                 state.loading = false;
+                state.isRegistered = false;
             });
     }
 });
