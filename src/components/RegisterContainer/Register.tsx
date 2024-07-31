@@ -1,16 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import {authActions, RootState} from "../../store";
-import {useAppDispatch} from "../../hooks";
-import {useNavigate} from "react-router-dom";
+import { authActions, RootState } from '../../store';
+import { useAppDispatch } from '../../hooks';
+import { useNavigate } from 'react-router-dom';
+import Modal from 'react-modal';
 
 const Register = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { isRegistered,loading, error } = useSelector((state: RootState) => state.auth);
+    const { isRegistered, loading, error } = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,9 +21,14 @@ const Register = () => {
 
     useEffect(() => {
         if (isRegistered) {
-            navigate('/auth/login');
+            setModalIsOpen(true);
         }
-    }, [isRegistered, navigate]);
+    }, [isRegistered]);
+
+    const closeModal = () => {
+        setModalIsOpen(false);
+        navigate('/auth/login');
+    };
 
     return (
         <div>
@@ -51,6 +58,16 @@ const Register = () => {
                 <button type="submit" disabled={loading}>Register</button>
             </form>
             {error && <p>{error}</p>}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Email Confirmation Modal"
+                ariaHideApp={false}
+            >
+                <h2>Registration Successful</h2>
+                <p>Please check your email for confirmation.</p>
+                <button onClick={closeModal}>OK</button>
+            </Modal>
         </div>
     );
 };

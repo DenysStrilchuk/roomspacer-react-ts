@@ -39,7 +39,7 @@ const register = createAsyncThunk<{ user: IUser, token: string }, { email: strin
     async ({ email, password, name }, { rejectWithValue }) => {
         try {
             const data = await authService.register(email, password, name);
-            return { user: data.user, token: data.token };
+            return { user: data.user, token: data.token, message: data.message };
         } catch (e) {
             const err = e as AxiosError;
             console.error('Registration error:', err.response?.data); // Лог для помилки реєстрації
