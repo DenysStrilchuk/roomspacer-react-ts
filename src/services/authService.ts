@@ -54,7 +54,7 @@ const forgotPassword = async (email: string) => {
 const resetPassword = async (token: string, newPassword: string) => {
     try {
         const url = `${baseURL}${urls.resetPassword.base}`;
-        await axios.patch(url, { token, newPassword });
+        await axios.post(url, { token, newPassword });
     } catch (error) {
         if (error instanceof AxiosError) {
             console.error('Axios error:', error);

@@ -21,7 +21,6 @@ const ResetPassword = () => {
             navigate('/auth/login');
         } else {
             console.error("Token is missing");
-            // Handle the missing token case appropriately, e.g., show an error message
         }
     };
 
