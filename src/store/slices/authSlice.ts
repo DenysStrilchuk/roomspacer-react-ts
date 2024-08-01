@@ -4,7 +4,6 @@ import { AxiosError } from 'axios';
 import { authService } from '../../services';
 import { IUser } from '../../interfaces';
 
-// Інтерфейс для обробки помилок
 interface IErrorResponse {
     message: string;
 }
@@ -53,7 +52,7 @@ const register = createAsyncThunk<{ user: IUser, token: string }, { email: strin
     }
 );
 
-const forgotPassword = createAsyncThunk<void, { email: string, password: string }>(
+const forgotPassword = createAsyncThunk<void, { email: string }>(
     'authSlice/forgotPassword',
     async ({ email }, { rejectWithValue }) => {
         try {
@@ -61,6 +60,18 @@ const forgotPassword = createAsyncThunk<void, { email: string, password: string 
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
             return rejectWithValue(err.response?.data.message || 'Failed to send reset link');
+        }
+    }
+);
+
+const resetPassword = createAsyncThunk<void, { token: string, newPassword: string }>(
+    'authSlice/resetPassword',
+    async ({ token, newPassword }, { rejectWithValue }) => {
+        try {
+            await authService.resetPassword(token, newPassword);
+        } catch (e) {
+            const err = e as AxiosError<IErrorResponse>;
+            return rejectWithValue(err.response?.data.message || 'Failed to reset password');
         }
     }
 );
@@ -118,6 +129,17 @@ const authSlice = createSlice({
             .addCase(forgotPassword.rejected, (state, action) => {
                 state.error = action.payload as string;
                 state.loading = false;
+            })
+            .addCase(resetPassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(resetPassword.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(resetPassword.rejected, (state, action) => {
+                state.error = action.payload as string;
+                state.loading = false;
             });
     },
 });
@@ -127,7 +149,8 @@ const authActions = {
     ...actions,
     login,
     register,
-    forgotPassword
+    forgotPassword,
+    resetPassword
 };
 
 export {

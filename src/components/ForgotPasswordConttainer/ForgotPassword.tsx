@@ -2,17 +2,16 @@ import React, { useState } from 'react';
 import css from './ForgotPassword.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
-//import { useAppDispatch } from '../../hooks';
-//import { authActions } from '../../store';
+import { useAppDispatch } from '../../hooks';
+import { authActions } from '../../store';
 
 const ForgotPassword = () => {
-    //const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
     const [email, setEmail] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Додайте тут логіку для відправки запиту на відновлення паролю
-        //dispatch(authActions.forgotPassword({ email }));
+        dispatch(authActions.forgotPassword({ email }));
     };
 
     return (

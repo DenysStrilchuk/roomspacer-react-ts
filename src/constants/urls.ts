@@ -4,6 +4,8 @@ const login = '/auth/login';
 
 const register = '/auth/register';
 
+const forgotPassword = '/auth/forgot-password'
+
 const resetPassword = '/auth/reset-password';
 
 const urls = {
@@ -12,6 +14,9 @@ const urls = {
     },
     register: {
         base: register
+    },
+    forgotPassword: {
+        base: forgotPassword
     },
     resetPassword: {
         base: resetPassword
