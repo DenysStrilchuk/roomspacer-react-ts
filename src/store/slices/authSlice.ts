@@ -53,6 +53,18 @@ const register = createAsyncThunk<{ user: IUser, token: string }, { email: strin
     }
 );
 
+const forgotPassword = createAsyncThunk<void, { email: string, password: string }>(
+    'authSlice/forgotPassword',
+    async ({ email }, { rejectWithValue }) => {
+        try {
+            await authService.forgotPassword(email);
+        } catch (e) {
+            const err = e as AxiosError<IErrorResponse>;
+            return rejectWithValue(err.response?.data.message || 'Failed to send reset link');
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'authSlice',
     initialState,
@@ -95,6 +107,17 @@ const authSlice = createSlice({
                 state.error = action.payload as string;
                 state.loading = false;
                 state.isRegistered = false;
+            })
+            .addCase(forgotPassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(forgotPassword.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(forgotPassword.rejected, (state, action) => {
+                state.error = action.payload as string;
+                state.loading = false;
             });
     },
 });
@@ -104,6 +127,7 @@ const authActions = {
     ...actions,
     login,
     register,
+    forgotPassword
 };
 
 export {

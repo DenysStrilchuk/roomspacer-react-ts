@@ -35,9 +35,26 @@ const login = async (email: string, password: string) => {
     }
 };
 
+const forgotPassword = async (email: string) => {
+    try {
+        const url = `${baseURL}${urls.resetPassword.base}`;
+        await axios.post(url, { email });
+    } catch (error) {
+        if (error instanceof AxiosError) {
+            console.error('Axios error:', error);
+            console.error('Server error data:', error.response?.data);
+            throw error.response?.data || { message: 'Failed to send reset link' };
+        } else {
+            console.error('Unexpected error:', error);
+            throw { message: 'Unexpected error occurred' };
+        }
+    }
+};
+
 const authService = {
     register,
     login,
+    forgotPassword
 };
 
 export {

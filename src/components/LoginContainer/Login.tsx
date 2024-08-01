@@ -21,7 +21,6 @@ const Login = () => {
     };
 
     const handleForgotPassword = () => {
-        // Додайте тут логіку для обробки відновлення паролю
         navigate('/auth/recovery');
     };
 

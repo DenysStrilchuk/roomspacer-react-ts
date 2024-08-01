@@ -4,6 +4,9 @@ import { authActions, RootState } from '../../store';
 import { useAppDispatch } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
+import css from './Register.module.css';
+import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Register = () => {
     const dispatch = useAppDispatch();
@@ -13,6 +16,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,31 +35,48 @@ const Register = () => {
     };
 
     return (
-        <div>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit" disabled={loading}>Register</button>
+        <div className={css.registerContainer}>
+            <form onSubmit={handleSubmit} className={css.registerForm}>
+                <h2>Sign Up</h2>
+                <div className={css.inputContainer}>
+                    <FontAwesomeIcon icon={faUser} className={css.icon} />
+                    <input
+                        type="text"
+                        placeholder="Full name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className={css.registerInput}
+                    />
+                </div>
+                <div className={css.inputContainer}>
+                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
+                    <input
+                        type="email"
+                        placeholder="Email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className={css.registerInput}
+                    />
+                </div>
+                <div className={css.inputContainer}>
+                    <FontAwesomeIcon icon={faLock} className={css.icon} />
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className={css.registerInput}
+                    />
+                    <FontAwesomeIcon
+                        icon={showPassword ? faEye : faEyeSlash}
+                        className={css.eyeIcon}
+                        onClick={() => setShowPassword(!showPassword)}
+                    />
+                </div>
+                <button type="submit" disabled={loading} className={css.registerButton}>Register</button>
             </form>
             {error && <p>{error}</p>}
             <Modal
