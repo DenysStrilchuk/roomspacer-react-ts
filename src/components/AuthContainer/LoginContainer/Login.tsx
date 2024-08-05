@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { authActions, RootState } from '../../store';
-import { useAppDispatch } from '../../hooks';
+import { authActions, RootState } from '../../../store';
+import { useAppDispatch } from '../../../hooks';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';

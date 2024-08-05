@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import css from './ForgotPassword.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import { useAppDispatch } from '../../hooks';
-import { authActions } from '../../store';
+import { useAppDispatch } from '../../../hooks';
+import { authActions } from '../../../store';
 
 const ForgotPassword = () => {
     const dispatch = useAppDispatch();

@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import css from './ResetPassword.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { useAppDispatch } from '../../hooks';
-import { authActions } from '../../store';
+import { useAppDispatch } from '../../../hooks';
+import { authActions } from '../../../store';
 
 const ResetPassword = () => {
     const dispatch = useAppDispatch();

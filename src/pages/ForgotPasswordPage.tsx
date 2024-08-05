@@ -1,4 +1,4 @@
-import {ForgotPassword} from "../components";
+import {ForgotPassword} from "../components/AuthContainer";
 
 const ForgotPasswordPage = () => {
     return (

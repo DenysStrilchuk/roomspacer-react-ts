@@ -1,11 +1,9 @@
 const baseURL = 'http://localhost:3001';
 
 const login = '/auth/login';
-
 const register = '/auth/register';
-
-const forgotPassword = '/auth/forgot-password'
-
+const confirmEmail = '/auth/confirm';
+const forgotPassword = '/auth/forgot-password';
 const resetPassword = '/auth/reset-password';
 
 const urls = {
@@ -14,6 +12,9 @@ const urls = {
     },
     register: {
         base: register
+    },
+    confirmEmail: {
+        base: confirmEmail
     },
     forgotPassword: {
         base: forgotPassword

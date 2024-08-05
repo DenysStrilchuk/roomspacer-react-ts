@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { MainLayout } from './layouts';
-import {ForgotPasswordPage, LoginPage, MainPage, RegisterPage, ResetPasswordPage} from "./pages";
+import { ConfirmEmailPage, ForgotPasswordPage, LoginPage, MainPage, RegisterPage, ResetPasswordPage } from "./pages";
 
 const router = createBrowserRouter([
     {
@@ -10,6 +10,7 @@ const router = createBrowserRouter([
             { path: 'auth/login', element: <LoginPage /> },
             { path: 'auth/recovery', element: <ForgotPasswordPage /> },
             { path: 'auth/reset-password/:token', element: <ResetPasswordPage /> },
+            { path: 'auth/confirm/:token', element: <ConfirmEmailPage /> }, // Новий маршрут для підтвердження електронної пошти
             { path: 'main', element: <MainPage /> },
         ],
     },

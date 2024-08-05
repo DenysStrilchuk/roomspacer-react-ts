@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { authActions, RootState } from '../../store';
-import { useAppDispatch } from '../../hooks';
+import { authActions, RootState } from '../../../store';
+import { useAppDispatch } from '../../../hooks';
 import { useNavigate } from 'react-router-dom';
 import Modal from 'react-modal';
 import css from './Register.module.css';
 import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const Register = () => {
+const Register: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { isRegistered, loading, error } = useSelector((state: RootState) => state.auth);
