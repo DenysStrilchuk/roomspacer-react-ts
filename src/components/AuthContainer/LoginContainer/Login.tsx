@@ -61,6 +61,7 @@ const Login = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     />
                 </div>
+                {error && <p className={css.errorMessage}>{error}</p>}
                 <p className={css.forgotPassword} onClick={handleForgotPassword}>
                     Forgot your password?
                 </p>
@@ -68,7 +69,6 @@ const Login = () => {
                     <button type="submit" disabled={loading} className={css.loginButton}>Sign In</button>
                 </div>
             </form>
-            {error && <p>{error}</p>}
         </div>
     );
 };
