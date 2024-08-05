@@ -10,7 +10,7 @@ const router = createBrowserRouter([
             { path: 'auth/login', element: <LoginPage /> },
             { path: 'auth/recovery', element: <ForgotPasswordPage /> },
             { path: 'auth/reset-password/:token', element: <ResetPasswordPage /> },
-            { path: 'auth/confirm/:token', element: <ConfirmEmailPage /> }, // Новий маршрут для підтвердження електронної пошти
+            { path: 'auth/confirm/:token', element: <ConfirmEmailPage /> },
             { path: 'main', element: <MainPage /> },
         ],
     },

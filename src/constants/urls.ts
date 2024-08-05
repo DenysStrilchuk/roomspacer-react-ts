@@ -22,9 +22,9 @@ const urls = {
     resetPassword: {
         base: resetPassword
     }
-}
+};
 
 export {
     baseURL,
     urls
-}
+};

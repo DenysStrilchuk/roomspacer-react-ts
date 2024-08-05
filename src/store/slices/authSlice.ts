@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {AxiosError} from 'axios';
 
-import { authService } from '../../services';
-import { IUser } from '../../interfaces';
+import {authService} from '../../services';
+import {IUser} from '../../interfaces';
 
 interface IErrorResponse {
     message: string;
@@ -28,10 +28,10 @@ const initialState: IAuthState = {
 
 const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string }>(
     'authSlice/login',
-    async ({ email, password }, { rejectWithValue }) => {
+    async ({email, password}, {rejectWithValue}) => {
         try {
             const data = await authService.login(email, password);
-            return { user: data.user, token: data.token };
+            return {user: data.user, token: data.token};
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
             return rejectWithValue(err.response?.data.message || 'Login failed');
@@ -41,10 +41,10 @@ const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, 
 
 const register = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string, name: string }>(
     'authSlice/register',
-    async ({ email, password, name }, { rejectWithValue }) => {
+    async ({email, password, name}, {rejectWithValue}) => {
         try {
             const data = await authService.register(email, password, name);
-            return { user: data.user, token: data.token };
+            return {user: data.user, token: data.token};
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
             return rejectWithValue(err.response?.data.message || 'Registration failed');
@@ -54,7 +54,7 @@ const register = createAsyncThunk<{ user: IUser, token: string }, { email: strin
 
 const forgotPassword = createAsyncThunk<void, { email: string }>(
     'authSlice/forgotPassword',
-    async ({ email }, { rejectWithValue }) => {
+    async ({email}, {rejectWithValue}) => {
         try {
             await authService.forgotPassword(email);
         } catch (e) {
@@ -66,7 +66,7 @@ const forgotPassword = createAsyncThunk<void, { email: string }>(
 
 const resetPassword = createAsyncThunk<void, { token: string, newPassword: string }>(
     'authSlice/resetPassword',
-    async ({ token, newPassword }, { rejectWithValue }) => {
+    async ({token, newPassword}, {rejectWithValue}) => {
         try {
             await authService.resetPassword(token, newPassword);
         } catch (e) {
@@ -144,7 +144,7 @@ const authSlice = createSlice({
     },
 });
 
-const { reducer: authReducer, actions } = authSlice;
+const {reducer: authReducer, actions} = authSlice;
 const authActions = {
     ...actions,
     login,
@@ -157,4 +157,3 @@ export {
     authReducer,
     authActions,
 };
-
