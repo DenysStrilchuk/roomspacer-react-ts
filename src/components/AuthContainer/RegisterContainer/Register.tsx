@@ -1,26 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { authActions, RootState } from '../../../store';
-import { useAppDispatch } from '../../../hooks';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {authActions, RootState} from '../../../store';
+import {useAppDispatch} from '../../../hooks';
+import {useNavigate} from 'react-router-dom';
 import Modal from 'react-modal';
 import css from './Register.module.css';
-import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faEnvelope, faUser, faLock, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
 const Register: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { isRegistered, loading, error } = useSelector((state: RootState) => state.auth);
+    const {isRegistered, loading, error} = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        dispatch(authActions.register({ email, password, name }));
+        setFormErrors({}); // Reset errors before each submission
+        try {
+            await dispatch(authActions.register({email, password, name})).unwrap();
+            setModalIsOpen(true);
+        } catch (e) {
+            if (e && typeof e === 'string') {
+                // Assuming the error message is a string with the error details
+                setFormErrors({
+                    global: e,
+                });
+            }
+        }
     };
 
     useEffect(() => {
@@ -39,7 +51,7 @@ const Register: React.FC = () => {
             <form onSubmit={handleSubmit} className={css.registerForm}>
                 <h2>Sign Up</h2>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faUser} className={css.icon} />
+                    <FontAwesomeIcon icon={faUser} className={css.icon}/>
                     <input
                         type="text"
                         placeholder="Full name"
@@ -48,9 +60,10 @@ const Register: React.FC = () => {
                         required
                         className={css.registerInput}
                     />
+                    {formErrors.name && <p className={css.errorText}>{formErrors.name}</p>}
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
+                    <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
                     <input
                         type="email"
                         placeholder="Email address"
@@ -59,9 +72,10 @@ const Register: React.FC = () => {
                         required
                         className={css.registerInput}
                     />
+                    {formErrors.email && <p className={css.errorText}>{formErrors.email}</p>}
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon} />
+                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
                     <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -75,10 +89,11 @@ const Register: React.FC = () => {
                         className={css.eyeIcon}
                         onClick={() => setShowPassword(!showPassword)}
                     />
+                    {formErrors.password && <p className={css.errorText}>{formErrors.password}</p>}
                 </div>
+                {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
                 <button type="submit" disabled={loading} className={css.registerButton}>Register</button>
             </form>
-            {error && <p>{error}</p>}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
@@ -93,4 +108,6 @@ const Register: React.FC = () => {
     );
 };
 
-export { Register };
+export {
+    Register
+}

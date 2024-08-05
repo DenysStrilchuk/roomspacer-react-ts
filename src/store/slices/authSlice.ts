@@ -1,11 +1,12 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {AxiosError} from 'axios';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
 
-import {authService} from '../../services';
-import {IUser} from '../../interfaces';
+import { authService } from '../../services';
+import { IUser } from '../../interfaces';
 
 interface IErrorResponse {
     message: string;
+    code?: string; // Додаткові поля можуть бути корисними
 }
 
 interface IAuthState {
@@ -26,52 +27,63 @@ const initialState: IAuthState = {
     isLogin: false,
 };
 
+// Оновлений login thunk
 const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string }>(
     'authSlice/login',
-    async ({email, password}, {rejectWithValue}) => {
+    async ({ email, password }, { rejectWithValue }) => {
         try {
             const data = await authService.login(email, password);
-            return {user: data.user, token: data.token};
+            return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
-            return rejectWithValue(err.response?.data.message || 'Login failed');
+            const errorMessage = err.response?.data.message || 'Login failed';
+            return rejectWithValue(errorMessage);
         }
     }
 );
 
-const register = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string, name: string }>(
+// Оновлений register thunk
+const register = createAsyncThunk<{ user: IUser; token: string }, { email: string; password: string; name: string }>(
     'authSlice/register',
-    async ({email, password, name}, {rejectWithValue}) => {
+    async ({ email, password, name }, { rejectWithValue }) => {
         try {
             const data = await authService.register(email, password, name);
-            return {user: data.user, token: data.token};
+            return { user: data.user, token: data.token };
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
-            return rejectWithValue(err.response?.data.message || 'Registration failed');
+            let errorMessage = 'Registration failed';
+            if (err.response?.status === 400 && err.response?.data.message) {
+                errorMessage = err.response.data.message;
+            }
+            return rejectWithValue(errorMessage);
         }
     }
 );
 
+// Оновлений forgotPassword thunk
 const forgotPassword = createAsyncThunk<void, { email: string }>(
     'authSlice/forgotPassword',
-    async ({email}, {rejectWithValue}) => {
+    async ({ email }, { rejectWithValue }) => {
         try {
             await authService.forgotPassword(email);
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
-            return rejectWithValue(err.response?.data.message || 'Failed to send reset link');
+            const errorMessage = err.response?.data.message || 'Failed to send reset link';
+            return rejectWithValue(errorMessage);
         }
     }
 );
 
+// Оновлений resetPassword thunk
 const resetPassword = createAsyncThunk<void, { token: string, newPassword: string }>(
     'authSlice/resetPassword',
-    async ({token, newPassword}, {rejectWithValue}) => {
+    async ({ token, newPassword }, { rejectWithValue }) => {
         try {
             await authService.resetPassword(token, newPassword);
         } catch (e) {
             const err = e as AxiosError<IErrorResponse>;
-            return rejectWithValue(err.response?.data.message || 'Failed to reset password');
+            const errorMessage = err.response?.data.message || 'Failed to reset password';
+            return rejectWithValue(errorMessage);
         }
     }
 );
@@ -144,7 +156,7 @@ const authSlice = createSlice({
     },
 });
 
-const {reducer: authReducer, actions} = authSlice;
+const { reducer: authReducer, actions } = authSlice;
 const authActions = {
     ...actions,
     login,

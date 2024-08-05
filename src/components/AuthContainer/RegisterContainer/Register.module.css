@@ -79,7 +79,9 @@ button:hover {
     color: #888;
 }
 
-p {
+.errorText {
     color: red;
-    text-align: center;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    text-align: left;
 }
