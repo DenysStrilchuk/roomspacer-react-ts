@@ -1,19 +1,20 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
-
 import { authService } from '../../services';
 import { IUser } from '../../interfaces';
 
 interface IErrorResponse {
-    message: string;
-    code?: string; // Додаткові поля можуть бути корисними
+    message?: string;
+    errors?: { [key: string]: string };
+    code?: string;
+    statusCode?: number;
 }
 
 interface IAuthState {
     user: IUser | null;
     token: string | null;
     loading: boolean;
-    error: string | null;
+    error: IErrorResponse | null;
     isRegistered: boolean;
     isLogin: boolean;
 }
@@ -27,74 +28,82 @@ const initialState: IAuthState = {
     isLogin: false,
 };
 
-// Оновлений login thunk
-const login = createAsyncThunk<{ user: IUser, token: string }, { email: string, password: string }>(
+const handleAxiosError = (e: unknown): IErrorResponse => {
+    const error = e as AxiosError<IErrorResponse>;
+    const errorMessage = error.response?.data || { message: 'An error occurred' };
+    return errorMessage;
+};
+
+const login = createAsyncThunk<
+    { user: IUser; token: string },
+    { email: string; password: string },
+    { rejectValue: IErrorResponse }
+>(
     'authSlice/login',
     async ({ email, password }, { rejectWithValue }) => {
         try {
             const data = await authService.login(email, password);
             return { user: data.user, token: data.token };
         } catch (e) {
-            const err = e as AxiosError<IErrorResponse>;
-            const errorMessage = err.response?.data.message || 'Login failed';
-            return rejectWithValue(errorMessage);
+            return rejectWithValue(handleAxiosError(e));
         }
     }
 );
 
-// Оновлений register thunk
-const register = createAsyncThunk<{ user: IUser; token: string }, { email: string; password: string; name: string }>(
+const register = createAsyncThunk<
+    { user: IUser; token: string },
+    { email: string; password: string; name: string },
+    { rejectValue: IErrorResponse }
+>(
     'authSlice/register',
     async ({ email, password, name }, { rejectWithValue }) => {
         try {
             const data = await authService.register(email, password, name);
             return { user: data.user, token: data.token };
         } catch (e) {
-            const err = e as AxiosError<IErrorResponse>;
-            let errorMessage = 'Registration failed';
-            if (err.response?.status === 400 && err.response?.data.message) {
-                errorMessage = err.response.data.message;
-            }
-            return rejectWithValue(errorMessage);
+            return rejectWithValue(handleAxiosError(e));
         }
     }
 );
 
-// Оновлений forgotPassword thunk
-const forgotPassword = createAsyncThunk<void, { email: string }>(
+const forgotPassword = createAsyncThunk<
+    void,
+    { email: string },
+    { rejectValue: IErrorResponse }
+>(
     'authSlice/forgotPassword',
     async ({ email }, { rejectWithValue }) => {
         try {
             await authService.forgotPassword(email);
         } catch (e) {
-            const err = e as AxiosError<IErrorResponse>;
-            const errorMessage = err.response?.data.message || 'Failed to send reset link';
-            return rejectWithValue(errorMessage);
+            return rejectWithValue(handleAxiosError(e));
         }
     }
 );
 
-// Оновлений resetPassword thunk
-const resetPassword = createAsyncThunk<void, { token: string, newPassword: string }>(
+const resetPassword = createAsyncThunk<
+    void,
+    { token: string; newPassword: string },
+    { rejectValue: IErrorResponse }
+>(
     'authSlice/resetPassword',
     async ({ token, newPassword }, { rejectWithValue }) => {
         try {
             await authService.resetPassword(token, newPassword);
         } catch (e) {
-            const err = e as AxiosError<IErrorResponse>;
-            const errorMessage = err.response?.data.message || 'Failed to reset password';
-            return rejectWithValue(errorMessage);
+            return rejectWithValue(handleAxiosError(e));
         }
     }
 );
 
 const authSlice = createSlice({
-    name: 'authSlice',
+    name: 'auth',
     initialState,
     reducers: {
         logout: (state) => {
             state.user = null;
             state.token = null;
+            state.isLogin = false;
         },
     },
     extraReducers: (builder) => {
@@ -111,7 +120,7 @@ const authSlice = createSlice({
                 state.isLogin = true;
             })
             .addCase(login.rejected, (state, action) => {
-                state.error = action.payload as string;
+                state.error = action.payload || { message: 'Login failed' };
                 state.loading = false;
                 state.isLogin = false;
             })
@@ -121,15 +130,14 @@ const authSlice = createSlice({
                 state.isRegistered = false;
             })
             .addCase(register.fulfilled, (state, action) => {
-                state.user = action.payload.user;
-                state.token = action.payload.token;
                 state.loading = false;
                 state.isRegistered = true;
+                state.user = action.payload.user;
+                state.token = action.payload.token;
             })
             .addCase(register.rejected, (state, action) => {
-                state.error = action.payload as string;
                 state.loading = false;
-                state.isRegistered = false;
+                state.error = action.payload || { message: 'Registration failed' };
             })
             .addCase(forgotPassword.pending, (state) => {
                 state.loading = true;
@@ -139,7 +147,7 @@ const authSlice = createSlice({
                 state.loading = false;
             })
             .addCase(forgotPassword.rejected, (state, action) => {
-                state.error = action.payload as string;
+                state.error = action.payload || { message: 'Failed to send reset link' };
                 state.loading = false;
             })
             .addCase(resetPassword.pending, (state) => {
@@ -150,7 +158,7 @@ const authSlice = createSlice({
                 state.loading = false;
             })
             .addCase(resetPassword.rejected, (state, action) => {
-                state.error = action.payload as string;
+                state.error = action.payload || { message: 'Failed to reset password' };
                 state.loading = false;
             });
     },
@@ -162,7 +170,7 @@ const authActions = {
     login,
     register,
     forgotPassword,
-    resetPassword
+    resetPassword,
 };
 
 export {
