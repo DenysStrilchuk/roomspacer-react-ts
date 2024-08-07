@@ -1,17 +1,6 @@
 import axios from 'axios';
 import {baseURL, urls} from '../constants';
-import {IUser} from "../interfaces";
-
-interface ILoginResponse {
-    user: IUser;
-    token: string;
-}
-
-interface IRegisterResponse {
-    user: IUser;
-    token: string;
-}
-
+import {ILoginResponse, IRegisterResponse} from "../interfaces";
 
 const register = async (email: string, password: string, name: string): Promise<IRegisterResponse> => {
     const url = `${baseURL}${urls.register.base}`;

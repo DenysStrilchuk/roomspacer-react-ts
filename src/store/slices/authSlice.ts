@@ -1,14 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import { authService } from '../../services';
-import { IUser } from '../../interfaces';
-
-interface IErrorResponse {
-    message?: string;
-    errors?: { [key: string]: string };
-    code?: string;
-    statusCode?: number;
-}
+import {IErrorResponse, IUser} from '../../interfaces';
 
 interface IAuthState {
     user: IUser | null;
@@ -30,8 +23,7 @@ const initialState: IAuthState = {
 
 const handleAxiosError = (e: unknown): IErrorResponse => {
     const error = e as AxiosError<IErrorResponse>;
-    const errorMessage = error.response?.data || { message: 'An error occurred' };
-    return errorMessage;
+    return error.response?.data || { message: 'An error occurred' };
 };
 
 const login = createAsyncThunk<
