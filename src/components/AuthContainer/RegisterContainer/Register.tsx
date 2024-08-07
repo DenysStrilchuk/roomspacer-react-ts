@@ -12,6 +12,7 @@ interface IFormErrors {
     name?: string;
     email?: string;
     password?: string;
+    confirmPassword?: string;
     global?: string;
 }
 
@@ -21,13 +22,34 @@ const Register: React.FC = () => {
     const { isRegistered, loading, error } = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [name, setName] = useState('');
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Додано для підтвердження пароля
     const [formErrors, setFormErrors] = useState<IFormErrors>({});
+
+    const validateForm = () => {
+        const newErrors: IFormErrors = {};
+        if (name.length < 3) {
+            newErrors.name = 'Name must be at least 3 characters long';
+        }
+        if (!/\W/.test(password) || password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters long and contain at least one special character';
+        }
+        if (password !== confirmPassword) {
+            newErrors.confirmPassword = 'Passwords do not match';
+        }
+        return newErrors;
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setFormErrors(validationErrors);
+            return;
+        }
         setFormErrors({});
         try {
             await dispatch(authActions.register({ email, password, name })).unwrap();
@@ -79,7 +101,6 @@ const Register: React.FC = () => {
                         required
                         className={css.registerInput}
                     />
-                    {formErrors.name && <p className={css.errorText}>{formErrors.name}</p>}
                 </div>
                 <div className={css.inputContainer}>
                     <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
@@ -91,7 +112,6 @@ const Register: React.FC = () => {
                         required
                         className={css.registerInput}
                     />
-                    {formErrors.email && <p className={css.errorText}>{formErrors.email}</p>}
                 </div>
                 <div className={css.inputContainer}>
                     <FontAwesomeIcon icon={faLock} className={css.icon} />
@@ -108,8 +128,27 @@ const Register: React.FC = () => {
                         className={css.togglePassword}
                         onClick={() => setShowPassword(!showPassword)}
                     />
-                    {formErrors.password && <p className={css.errorText}>{formErrors.password}</p>}
                 </div>
+                <div className={css.inputContainer}>
+                    <FontAwesomeIcon icon={faLock} className={css.icon} />
+                    <input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        className={css.registerInput}
+                    />
+                    <FontAwesomeIcon
+                        icon={showConfirmPassword ? faEye : faEyeSlash}
+                        className={css.togglePassword}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    />
+                </div>
+                {formErrors.name && <p className={css.errorText}>{formErrors.name}</p>}
+                {formErrors.email && <p className={css.errorText}>{formErrors.email}</p>}
+                {formErrors.password && <p className={css.errorText}>{formErrors.password}</p>}
+                {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
                 {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
                 <button type="submit" className={css.registerButton} disabled={loading}>
                     {loading ? 'Registering...' : 'Register'}
@@ -130,5 +169,4 @@ const Register: React.FC = () => {
     );
 };
 
-export {Register};
-
+export { Register };

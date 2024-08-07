@@ -35,7 +35,7 @@ const Login = () => {
             <form onSubmit={handleSubmit} className={css.loginForm}>
                 <h2>Sign In</h2>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
+                    <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
                     <input
                         type="email"
                         placeholder="E-mail"
@@ -46,7 +46,7 @@ const Login = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon} />
+                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
                     <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -61,10 +61,11 @@ const Login = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     />
                 </div>
+                    <p className={css.forgotPassword} onClick={handleForgotPassword}>
+                        Forgot your password?
+                    </p>
                 {error?.message && <p className={css.errorMessage}>{error.message}</p>}
-                <p className={css.forgotPassword} onClick={handleForgotPassword}>
-                    Forgot your password?
-                </p>
+
                 <div className={css.loginButtonContainer}>
                     <button type="submit" disabled={loading} className={css.loginButton}>Sign In</button>
                 </div>
@@ -73,4 +74,4 @@ const Login = () => {
     );
 };
 
-export { Login };
+export {Login};

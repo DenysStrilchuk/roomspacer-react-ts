@@ -11,7 +11,7 @@
     align-items: center;
     max-width: 400px;
     width: 100%;
-    margin: 0 auto;
+    margin: 0;
     padding: 2rem;
     background-color: #fff;
 }
@@ -26,7 +26,7 @@
 
 .inputContainer {
     position: relative;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     width: 100%;
 }
 
@@ -49,6 +49,7 @@
 
 .loginInput {
     width: 100%;
+    height: 45px;
     padding: 0.5rem 2.5rem 0.5rem 2.5rem;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -72,8 +73,9 @@
 }
 
 .forgotPassword {
+    margin-top: 0;
     align-self: flex-end;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     font-family: 'Arial', sans-serif;
     color: rgb(119, 124, 138);
     cursor: pointer;
