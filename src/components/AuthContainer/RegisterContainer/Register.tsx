@@ -5,6 +5,8 @@ import { useAppDispatch } from '../../../hooks';
 import css from './Register.module.css';
 import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 interface IFormErrors {
     name?: string;
@@ -158,10 +160,30 @@ const Register: React.FC = () => {
                 {formErrors.password && <p className={css.errorText}>{formErrors.password}</p>}
                 {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
                 {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
+
                 <button type="submit" className={css.registerButton} disabled={loading || !agreeToTerms}>
                     {loading ? 'Creating...' : 'Create your free account'}
                 </button>
+
+                <div className={css.divider}>
+                    <span className={css.line}></span>
+                    <span className={css.orText}>Or</span>
+                    <span className={css.line}></span>
+                </div>
+
+                <div className={css.googleButtonContainer}>
+                    <button className={css.googleButton}>
+                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
+                        Sign up with Google
+                    </button>
+                </div>
+
+                <div className={css.signInContainer}>
+                    <p className={css.haveAccountText}>Already have an account?</p>
+                    <Link to="/auth/login" className={css.signInLink}>Sign In</Link>
+                </div>
             </form>
+
             {showConfirmationMessage && (
                 <div className={css.modalOverlay}>
                     <div className={`${css.confirmationMessage} ${css.fadeIn}`}>

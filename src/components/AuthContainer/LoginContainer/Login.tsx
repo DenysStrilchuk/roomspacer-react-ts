@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { authActions, RootState } from '../../../store';
 import { useAppDispatch } from '../../../hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import css from './Login.module.css';
 
 const Login = () => {
@@ -35,7 +36,7 @@ const Login = () => {
             <form onSubmit={handleSubmit} className={css.loginForm}>
                 <h2>Sign In</h2>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
+                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
                     <input
                         type="email"
                         placeholder="E-mail"
@@ -46,7 +47,7 @@ const Login = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
+                    <FontAwesomeIcon icon={faLock} className={css.icon} />
                     <input
                         type={showPassword ? "text" : "password"}
                         placeholder="Password"
@@ -61,17 +62,35 @@ const Login = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     />
                 </div>
-                    <p className={css.forgotPassword} onClick={handleForgotPassword}>
-                        Forgot your password?
-                    </p>
+                <p className={css.forgotPassword} onClick={handleForgotPassword}>
+                    Forgot your password?
+                </p>
                 {error?.message && <p className={css.errorMessage}>{error.message}</p>}
 
                 <div className={css.loginButtonContainer}>
                     <button type="submit" disabled={loading} className={css.loginButton}>Sign In</button>
+                </div>
+
+                <div className={css.divider}>
+                    <span className={css.line}></span>
+                    <span className={css.orText}>Or</span>
+                    <span className={css.line}></span>
+                </div>
+
+                <div className={css.googleButtonContainer}>
+                    <button className={css.googleButton}>
+                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <div className={css.signUpContainer}>
+                    <p className={css.noAccountText}>Don't have an account?</p>
+                    <Link to="/auth/register" className={css.signUpLink}>Sign Up</Link>
                 </div>
             </form>
         </div>
     );
 };
 
-export {Login};
+export { Login };

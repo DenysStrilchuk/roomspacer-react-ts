@@ -172,3 +172,72 @@
 .link:hover {
     text-decoration: underline;
 }
+
+.divider {
+    display: flex;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    color: rgb(119, 124, 138);
+    width: 100%;
+    margin: 20px 0;
+}
+
+.line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: #ccc;
+}
+
+.orText {
+    margin: 0 10px;
+    font-size: 14px;
+    color: #888;
+    white-space: nowrap;
+}
+
+.googleButtonContainer {
+    width: 100%; /* Забезпечує ширину контейнера */
+}
+
+.googleButton {
+    width: 100%; /* Встановлює ширину кнопки */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Вирівнює текст та іконку по центру */
+    background-color: #fff;
+    color: rgb(70,77,97);
+    font-family: 'Arial', sans-serif;
+    border: 2px solid rgb(191,193,196);
+    padding: 0.75rem 2.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    box-sizing: border-box; /* Забезпечує коректний розрахунок padding */
+}
+
+.googleIcon {
+    margin-right: 8px;
+}
+
+.signInContainer {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.haveAccountText {
+    font-family: 'Arial', sans-serif;
+    color: rgb(119, 124, 138);
+    margin-bottom: 1.5rem;
+}
+
+.signInLink {
+    font-family: 'Arial', sans-serif;
+    color: rgb(70, 77, 97);
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.signInLink:hover {
+    text-decoration: underline;
+}
