@@ -6,80 +6,114 @@ import { faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch } from '../../../hooks';
 import { authActions } from '../../../store';
 
+interface IFormErrors {
+    password?: string;
+    confirmPassword?: string;
+}
+
 const ResetPassword = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { token } = useParams<{ token: string }>();
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [successMessage, setSuccessMessage] = useState('');
+    const [formErrors, setFormErrors] = useState<IFormErrors>({});
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const validatePassword = () => {
+        const errors: IFormErrors = {};
+        if (!/\W/.test(newPassword) || newPassword.length < 8) {
+            errors.password = 'The password must be at least 8 characters long and contain at least one special character.';
+        }
+        if (newPassword !== confirmPassword) {
+            errors.confirmPassword = 'Passwords do not match.';
+        }
+        return errors;
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (newPassword !== confirmPassword) {
-            alert("Passwords do not match");
+        const validationErrors = validatePassword();
+        if (Object.keys(validationErrors).length > 0) {
+            setFormErrors(validationErrors);
             return;
         }
 
         if (token) {
-            dispatch(authActions.resetPassword({ token, newPassword }))
-                .then(() => {
-                    setSuccessMessage("Password successfully changed");
-                    setTimeout(() => {
-                        navigate('/auth/login');
-                    }, 2000); // Redirect after 2 seconds
-                })
-                .catch((error) => {
-                    console.error("Error resetting password", error);
-                });
+            setStatus('loading');
+            try {
+                await dispatch(authActions.resetPassword({ token, newPassword })).unwrap();
+                setStatus('success');
+                setSuccessMessage("Password changed successfully");
+                setTimeout(() => {
+                    navigate('/auth/login');
+                }, 2000); // Redirect after 2 seconds
+            } catch (error) {
+                setStatus('error');
+                console.error("An error occurred when changing the password", error);
+            }
         } else {
-            console.error("Token is missing");
+            console.error("The token is missing");
         }
     };
 
     return (
         <div className={css.resetPasswordContainer}>
             <form onSubmit={handleSubmit} className={css.resetPasswordForm}>
-                <h2>Reset Password</h2>
+                <h2>Password change</h2>
+
                 <div className={css.inputContainer}>
                     <FontAwesomeIcon icon={faLock} className={css.icon} />
                     <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="New Password"
+                        type={showNewPassword ? "text" : "password"}
+                        placeholder="New password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         required
                         className={css.resetPasswordInput}
                     />
                     <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
+                        icon={showNewPassword ? faEye : faEyeSlash}
                         className={css.eyeIcon}
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={() => setShowNewPassword(!showNewPassword)}
                     />
                 </div>
+                {formErrors.password && <p className={css.errorText}>{formErrors.password}</p>}
+
                 <div className={css.inputContainer}>
                     <FontAwesomeIcon icon={faLock} className={css.icon} />
                     <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Confirm Password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         className={css.resetPasswordInput}
                     />
                     <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
+                        icon={showConfirmPassword ? faEye : faEyeSlash}
                         className={css.eyeIcon}
-                        onClick={() => setShowPassword(!showPassword)}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     />
                 </div>
-                <button type="submit" className={css.resetPasswordButton}>
-                    Reset Password
+                {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
+
+                <button
+                    type="submit"
+                    className={css.resetPasswordButton}
+                    disabled={status === 'loading'}
+                >
+                    {status === 'loading' ? 'Change...' : 'Change password'}
                 </button>
-                {successMessage && (
+                {status === 'success' && (
                     <p className={css.successMessage}>{successMessage}</p>
+                )}
+                {status === 'error' && (
+                    <p className={css.errorMessage}>Failed to change password. Try again.</p>
                 )}
             </form>
         </div>

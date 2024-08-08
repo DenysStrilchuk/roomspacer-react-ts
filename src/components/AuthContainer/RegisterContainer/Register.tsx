@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { authActions, RootState } from '../../../store';
 import { useAppDispatch } from '../../../hooks';
-import { useNavigate } from 'react-router-dom';
-import Modal from 'react-modal';
 import css from './Register.module.css';
 import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,16 +16,16 @@ interface IFormErrors {
 
 const Register: React.FC = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
     const { isRegistered, loading, error } = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [name, setName] = useState('');
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Додано для підтвердження пароля
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formErrors, setFormErrors] = useState<IFormErrors>({});
+    const [showConfirmationMessage, setShowConfirmationMessage] = useState(false);
+    const [agreeToTerms, setAgreeToTerms] = useState(false);
 
     const validateForm = () => {
         const newErrors: IFormErrors = {};
@@ -39,6 +37,9 @@ const Register: React.FC = () => {
         }
         if (password !== confirmPassword) {
             newErrors.confirmPassword = 'Passwords do not match';
+        }
+        if (!agreeToTerms) {
+            newErrors.global = 'You must agree to the terms and policies';
         }
         return newErrors;
     };
@@ -53,7 +54,7 @@ const Register: React.FC = () => {
         setFormErrors({});
         try {
             await dispatch(authActions.register({ email, password, name })).unwrap();
-            setModalIsOpen(true);
+            setShowConfirmationMessage(true);
         } catch (err) {
             console.error('Error during registration:', err);
         }
@@ -61,7 +62,7 @@ const Register: React.FC = () => {
 
     useEffect(() => {
         if (isRegistered) {
-            setModalIsOpen(true);
+            setShowConfirmationMessage(true);
         }
     }, [isRegistered]);
 
@@ -81,11 +82,6 @@ const Register: React.FC = () => {
             setFormErrors(newErrors);
         }
     }, [error]);
-
-    const closeModal = () => {
-        setModalIsOpen(false);
-        navigate('/auth/login');
-    };
 
     return (
         <div className={css.registerContainer}>
@@ -145,26 +141,38 @@ const Register: React.FC = () => {
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     />
                 </div>
+                <div className={css.checkboxContainer}>
+                    <input
+                        type="checkbox"
+                        id="agreeToTerms"
+                        checked={agreeToTerms}
+                        onChange={(e) => setAgreeToTerms(e.target.checked)}
+                        className={css.checkboxInput}
+                    />
+                    <label htmlFor="agreeToTerms" className={css.checkboxLabel}>
+                        I agree to <a href="/terms" className={css.link}>Terms</a>, <a href="/privacy" className={css.link}>Privacy</a>, and <a href="/cookies" className={css.link}>Cookie policies</a>.
+                    </label>
+                </div>
                 {formErrors.name && <p className={css.errorText}>{formErrors.name}</p>}
                 {formErrors.email && <p className={css.errorText}>{formErrors.email}</p>}
                 {formErrors.password && <p className={css.errorText}>{formErrors.password}</p>}
                 {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
                 {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
-                <button type="submit" className={css.registerButton} disabled={loading}>
-                    {loading ? 'Registering...' : 'Register'}
+                <button type="submit" className={css.registerButton} disabled={loading || !agreeToTerms}>
+                    {loading ? 'Creating...' : 'Create your free account'}
                 </button>
             </form>
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Registration Confirmation"
-                className={css.modal}
-                overlayClassName={css.overlay}
-            >
-                <h2>Registration Successful!</h2>
-                <p>A confirmation email has been sent. Please check your inbox to verify your email address.</p>
-                <button onClick={closeModal} className={css.modalButton}>OK</button>
-            </Modal>
+            {showConfirmationMessage && (
+                <div className={css.modalOverlay}>
+                    <div className={`${css.confirmationMessage} ${css.fadeIn}`}>
+                        <h2>Registration Successful!</h2>
+                        <p>A confirmation email has been sent. Please check your inbox to verify your email address.</p>
+                        <button className={css.modalButton} onClick={() => setShowConfirmationMessage(false)}>
+                            Ok
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
