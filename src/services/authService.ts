@@ -1,56 +1,110 @@
 import axios from 'axios';
-import {baseURL, urls} from '../constants';
-import {ILoginResponse, IRegisterResponse} from "../interfaces";
+import { baseURL, urls } from '../constants';
+import { ILoginResponse, IRegisterResponse } from "../interfaces";
 
-const register = async (email: string, password: string, name: string): Promise<IRegisterResponse> => {
-    const url = `${baseURL}${urls.register.base}`;
-    const response = await axios.post(url, {email, password, name});
-    return response.data;
+// Створення екземпляру axios
+const axiosInstance = axios.create({
+    baseURL,
+    headers: {
+        'Content-Type': 'application/json',
+    }
+});
+
+// Збереження токену для авторизації
+const setAuthToken = (token: string | null) => {
+    if (token) {
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+        delete axiosInstance.defaults.headers.common['Authorization'];
+    }
 };
 
-
-const confirmEmail = async (token: string) => {
+// Реєстрація
+const register = async (email: string, password: string, name: string): Promise<IRegisterResponse> => {
     try {
-        const url = `${baseURL}${urls.confirmEmail.base}/${token}`;
-        const response = await axios.get(url);
+        const response = await axiosInstance.post(urls.register.base, { email, password, name });
         return response.data;
     } catch (error) {
-
+        console.error('Registration error:', error);
+        throw error;
     }
 };
 
-const login = async (email: string, password: string):Promise<ILoginResponse> => {
-    const url = `${baseURL}${urls.login.base}`;
-    const response = await axios.post(url, { email, password });
-    return response.data;
+// Підтвердження електронної пошти
+const confirmEmail = async (token: string) => {
+    try {
+        const response = await axiosInstance.get(`${urls.confirmEmail.base}/${token}`);
+        return response.data;
+    } catch (error) {
+        console.error('Email confirmation error:', error);
+        throw error;
+    }
 };
 
+// Логін
+const login = async (email: string, password: string): Promise<ILoginResponse> => {
+    try {
+        const response = await axiosInstance.post(urls.login.base, { email, password });
+        setAuthToken(response.data.token); // Зберігаємо токен після успішного логіну
+        return response.data;
+    } catch (error) {
+        console.error('Login error:', error);
+        throw error;
+    }
+};
+
+// Забули пароль
 const forgotPassword = async (email: string) => {
     try {
-        const url = `${baseURL}${urls.forgotPassword.base}`;
-        await axios.post(url, {email});
+        await axiosInstance.post(urls.forgotPassword.base, { email });
     } catch (error) {
-
+        console.error('Forgot password error:', error);
+        throw error;
     }
 };
 
+// Скидання пароля
 const resetPassword = async (token: string, newPassword: string) => {
     try {
-        const url = `${baseURL}${urls.resetPassword.base}`;
-        await axios.post(url, {token, newPassword});
+        await axiosInstance.post(urls.resetPassword.base, { token, newPassword });
     } catch (error) {
-
+        console.error('Reset password error:', error);
+        throw error;
     }
 };
 
+// Логін через Google
+const googleSignIn = async (googleToken: string): Promise<ILoginResponse> => {
+    try {
+        const response = await axiosInstance.post(urls.googleAuth.base, { token: googleToken });
+        setAuthToken(response.data.token); // Зберігаємо токен після успішного логіну
+        return response.data;
+    } catch (error) {
+        console.error('Google login error:', error);
+        throw error;
+    }
+};
+
+const googleSignUp = async (googleToken: string): Promise<IRegisterResponse> => {
+    try {
+        const response = await axiosInstance.post(urls.googleAuth.base, { token: googleToken });
+        setAuthToken(response.data.token); // Зберігаємо токен після успішної реєстрації
+        return response.data;
+    } catch (error) {
+        console.error('Google sign-up error:', error);
+        throw error;
+    }
+};
+
+// Сервіс аутентифікації
 const authService = {
     register,
     confirmEmail,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    googleSignIn,
+    googleSignUp,
 };
 
-export {
-    authService,
-};
+export { authService, setAuthToken };

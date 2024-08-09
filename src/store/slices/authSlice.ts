@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { AxiosError } from 'axios';
 import { authService } from '../../services';
-import {IErrorResponse, IUser} from '../../interfaces';
+import { IErrorResponse, IUser } from '../../interfaces';
 
 interface IAuthState {
     user: IUser | null;
@@ -26,6 +26,7 @@ const handleAxiosError = (e: unknown): IErrorResponse => {
     return error.response?.data || { message: 'An error occurred' };
 };
 
+// Existing async thunks for email/password authentication
 const login = createAsyncThunk<
     { user: IUser; token: string },
     { email: string; password: string },
@@ -51,6 +52,39 @@ const register = createAsyncThunk<
     async ({ email, password, name }, { rejectWithValue }) => {
         try {
             const data = await authService.register(email, password, name);
+            return { user: data.user, token: data.token };
+        } catch (e) {
+            return rejectWithValue(handleAxiosError(e));
+        }
+    }
+);
+
+// New async thunks for Google authentication
+const googleSignIn = createAsyncThunk<
+    { user: IUser; token: string },
+    string, // accessToken
+    { rejectValue: IErrorResponse }
+>(
+    'authSlice/googleSignIn',
+    async (accessToken, { rejectWithValue }) => {
+        try {
+            const data = await authService.googleSignIn(accessToken);
+            return { user: data.user, token: data.token };
+        } catch (e) {
+            return rejectWithValue(handleAxiosError(e));
+        }
+    }
+);
+
+const googleSignUp = createAsyncThunk<
+    { user: IUser; token: string },
+    string, // accessToken
+    { rejectValue: IErrorResponse }
+>(
+    'authSlice/googleSignUp',
+    async (accessToken, { rejectWithValue }) => {
+        try {
+            const data = await authService.googleSignUp(accessToken);
             return { user: data.user, token: data.token };
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
@@ -131,6 +165,37 @@ const authSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || { message: 'Registration failed' };
             })
+            // Handling Google SignIn and SignUp
+            .addCase(googleSignIn.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.isLogin = false;
+            })
+            .addCase(googleSignIn.fulfilled, (state, action) => {
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                state.loading = false;
+                state.isLogin = true;
+            })
+            .addCase(googleSignIn.rejected, (state, action) => {
+                state.error = action.payload || { message: 'Google Sign-In failed' };
+                state.loading = false;
+                state.isLogin = false;
+            })
+            .addCase(googleSignUp.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(googleSignUp.fulfilled, (state, action) => {
+                state.loading = false;
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                state.isRegistered = true;
+            })
+            .addCase(googleSignUp.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || { message: 'Google Sign-Up failed' };
+            })
             .addCase(forgotPassword.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -161,6 +226,8 @@ const authActions = {
     ...actions,
     login,
     register,
+    googleSignIn,
+    googleSignUp,
     forgotPassword,
     resetPassword,
 };

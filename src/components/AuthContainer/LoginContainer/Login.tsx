@@ -6,9 +6,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import css from './Login.module.css';
+import { useGoogleLogin } from '@react-oauth/google';
 
-const Login = () => {
+const Login: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { isLogin, loading, error } = useSelector((state: RootState) => state.auth);
@@ -21,6 +23,15 @@ const Login = () => {
         dispatch(authActions.login({ email, password }));
     };
 
+    const googleLogin = useGoogleLogin({
+        onSuccess: (response) => {
+            dispatch(authActions.googleSignIn(response.access_token));
+        },
+        onError: () => {
+            console.log('Google Sign-In Failed');
+        },
+    });
+
     const handleForgotPassword = () => {
         navigate('/auth/recovery');
     };
@@ -32,64 +43,72 @@ const Login = () => {
     }, [isLogin, navigate]);
 
     return (
-        <div className={css.loginContainer}>
-            <form onSubmit={handleSubmit} className={css.loginForm}>
-                <h2>Sign In</h2>
-                <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
-                    <input
-                        type="email"
-                        placeholder="E-mail"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className={css.loginInput}
-                    />
-                </div>
-                <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon} />
-                    <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className={css.loginInput}
-                    />
-                    <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
-                        className={css.eyeIcon}
-                        onClick={() => setShowPassword(!showPassword)}
-                    />
-                </div>
-                <p className={css.forgotPassword} onClick={handleForgotPassword}>
-                    Forgot your password?
-                </p>
-                {error?.message && <p className={css.errorMessage}>{error.message}</p>}
+        <GoogleOAuthProvider clientId="3136741747-83ecomobkj1bhb7uvk9h4ftv5l3c75rg.apps.googleusercontent.com">
+            <div className={css.loginContainer}>
+                <form onSubmit={handleSubmit} className={css.loginForm}>
+                    <h2>Sign In</h2>
+                    <div className={css.inputContainer}>
+                        <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
+                        <input
+                            type="email"
+                            placeholder="E-mail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            className={css.loginInput}
+                        />
+                    </div>
+                    <div className={css.inputContainer}>
+                        <FontAwesomeIcon icon={faLock} className={css.icon} />
+                        <input
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className={css.loginInput}
+                        />
+                        <FontAwesomeIcon
+                            icon={showPassword ? faEye : faEyeSlash}
+                            className={css.eyeIcon}
+                            onClick={() => setShowPassword(!showPassword)}
+                        />
+                    </div>
+                    <p className={css.forgotPassword} onClick={handleForgotPassword}>
+                        Forgot your password?
+                    </p>
+                    {error?.message && <p className={css.errorMessage}>{error.message}</p>}
 
-                <div className={css.loginButtonContainer}>
-                    <button type="submit" disabled={loading} className={css.loginButton}>Sign In</button>
-                </div>
+                    <div className={css.loginButtonContainer}>
+                        <button type="submit" disabled={loading} className={css.loginButton}>
+                            Sign In
+                        </button>
+                    </div>
 
-                <div className={css.divider}>
-                    <span className={css.line}></span>
-                    <span className={css.orText}>Or</span>
-                    <span className={css.line}></span>
-                </div>
+                    <div className={css.divider}>
+                        <span className={css.line}></span>
+                        <span className={css.orText}>Or</span>
+                        <span className={css.line}></span>
+                    </div>
 
-                <div className={css.googleButtonContainer}>
-                    <button className={css.googleButton}>
-                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
-                        Sign in with Google
-                    </button>
-                </div>
+                    <div className={css.googleButtonContainer}>
+                        <button
+                            type="button"
+                            className={css.googleButton}
+                            onClick={() => googleLogin()}
+                        >
+                            <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
+                            Sign in with Google
+                        </button>
+                    </div>
 
-                <div className={css.signUpContainer}>
-                    <p className={css.noAccountText}>Don't have an account?</p>
-                    <Link to="/auth/register" className={css.signUpLink}>Sign Up</Link>
-                </div>
-            </form>
-        </div>
+                    <div className={css.signUpContainer}>
+                        <p className={css.noAccountText}>Don't have an account?</p>
+                        <Link to="/auth/register" className={css.signUpLink}>Sign Up</Link>
+                    </div>
+                </form>
+            </div>
+        </GoogleOAuthProvider>
     );
 };
 
