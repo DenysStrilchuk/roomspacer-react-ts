@@ -182,8 +182,8 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className={css.googleButtonContainer}>
-                    <button type="button" className={css.googleButton} onClick={()=>googleRegister}>
-                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
+                    <button type="button" className={css.googleButton} onClick={() => googleRegister()}>
+                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon}/>
                         Sign up with Google
                     </button>
                 </div>
