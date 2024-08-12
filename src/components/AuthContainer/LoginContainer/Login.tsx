@@ -5,7 +5,6 @@ import { useAppDispatch } from '../../../hooks';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import css from './Login.module.css';
 
 const Login: React.FC = () => {
@@ -101,7 +100,8 @@ const Login: React.FC = () => {
                         className={css.googleButton}
                         onClick={handleGoogleLogin} // Виклик логіна через Google
                     >
-                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
+                        <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
+                             alt={'googleIcon'} className={css.googleIcon}/>
                         Sign in with Google
                     </button>
                 </div>

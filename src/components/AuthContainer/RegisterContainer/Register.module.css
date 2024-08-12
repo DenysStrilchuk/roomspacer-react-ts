@@ -200,10 +200,10 @@
 }
 
 .googleButton {
-    width: 100%; /* Встановлює ширину кнопки */
+    width: 100%; /* Makes the button full width */
     display: flex;
     align-items: center;
-    justify-content: center; /* Вирівнює текст та іконку по центру */
+    justify-content: center; /* Centers the text and icon together */
     background-color: #fff;
     color: rgb(70,77,97);
     font-family: 'Arial', sans-serif;
@@ -212,11 +212,14 @@
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    box-sizing: border-box; /* Забезпечує коректний розрахунок padding */
+    box-sizing: border-box; /* Ensures proper padding calculation */
+    position: relative; /* Enables positioning of the icon */
 }
 
 .googleIcon {
-    margin-right: 8px;
+    position: absolute; /* Allows free positioning within the button */
+    left: 20px; /* Positions the icon 16px from the left edge of the button */
+    width: 30px;
 }
 
 .signInContainer {

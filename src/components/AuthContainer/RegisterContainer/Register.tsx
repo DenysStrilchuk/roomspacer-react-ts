@@ -6,7 +6,6 @@ import css from './Register.module.css';
 import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 interface IFormErrors {
     name?: string;
@@ -192,7 +191,8 @@ const Register: React.FC = () => {
 
                 <div className={css.googleButtonContainer}>
                     <button type="button" className={css.googleButton} onClick={handleGoogleSignUp}>
-                        <FontAwesomeIcon icon={faGoogle} className={css.googleIcon}/>
+                        <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
+                             alt={'googleIcon'} className={css.googleIcon}/>
                         Sign up with Google
                     </button>
                 </div>
