@@ -7,7 +7,6 @@ import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import {useGoogleLogin} from "@react-oauth/google";
 
 interface IFormErrors {
     name?: string;
@@ -62,15 +61,6 @@ const Register: React.FC = () => {
             console.error('Error during registration:', err);
         }
     };
-
-    const googleRegister = useGoogleLogin({
-        onSuccess: (response) => {
-            dispatch(authActions.googleSignUp(response.access_token));
-        },
-        onError: () => {
-            console.log('Google Sign-Up Failed');
-        },
-    });
 
     useEffect(() => {
         if (isRegistered) {
@@ -182,7 +172,7 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className={css.googleButtonContainer}>
-                    <button type="button" className={css.googleButton} onClick={() => googleRegister()}>
+                    <button type="button" className={css.googleButton}>
                         <FontAwesomeIcon icon={faGoogle} className={css.googleIcon}/>
                         Sign up with Google
                     </button>

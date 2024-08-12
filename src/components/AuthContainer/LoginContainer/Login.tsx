@@ -6,9 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import css from './Login.module.css';
-import { useGoogleLogin } from '@react-oauth/google';
 
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -23,15 +21,6 @@ const Login: React.FC = () => {
         dispatch(authActions.login({ email, password }));
     };
 
-    const googleLogin = useGoogleLogin({
-        onSuccess: (response) => {
-            dispatch(authActions.googleSignIn(response.access_token));
-        },
-        onError: () => {
-            console.log('Google Sign-In Failed');
-        },
-    });
-
     const handleForgotPassword = () => {
         navigate('/auth/recovery');
     };
@@ -43,7 +32,6 @@ const Login: React.FC = () => {
     }, [isLogin, navigate]);
 
     return (
-        <GoogleOAuthProvider clientId="3136741747-83ecomobkj1bhb7uvk9h4ftv5l3c75rg.apps.googleusercontent.com">
             <div className={css.loginContainer}>
                 <form onSubmit={handleSubmit} className={css.loginForm}>
                     <h2>Sign In</h2>
@@ -95,7 +83,6 @@ const Login: React.FC = () => {
                         <button
                             type="button"
                             className={css.googleButton}
-                            onClick={() => googleLogin()}
                         >
                             <FontAwesomeIcon icon={faGoogle} className={css.googleIcon} />
                             Sign in with Google
@@ -108,7 +95,6 @@ const Login: React.FC = () => {
                     </div>
                 </form>
             </div>
-        </GoogleOAuthProvider>
     );
 };
 

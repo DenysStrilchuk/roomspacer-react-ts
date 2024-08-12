@@ -73,38 +73,12 @@ const resetPassword = async (token: string, newPassword: string) => {
     }
 };
 
-// Логін через Google
-const googleSignIn = async (googleToken: string): Promise<ILoginResponse> => {
-    try {
-        const response = await axiosInstance.post(urls.googleAuth.base, { token: googleToken });
-        setAuthToken(response.data.token); // Зберігаємо токен після успішного логіну
-        return response.data;
-    } catch (error) {
-        console.error('Google login error:', error);
-        throw error;
-    }
-};
-
-const googleSignUp = async (googleToken: string): Promise<IRegisterResponse> => {
-    try {
-        const response = await axiosInstance.post(urls.googleAuth.base, { token: googleToken });
-        setAuthToken(response.data.token); // Зберігаємо токен після успішної реєстрації
-        return response.data;
-    } catch (error) {
-        console.error('Google sign-up error:', error);
-        throw error;
-    }
-};
-
-// Сервіс аутентифікації
 const authService = {
     register,
     confirmEmail,
     login,
     forgotPassword,
-    resetPassword,
-    googleSignIn,
-    googleSignUp,
+    resetPassword
 };
 
 export { authService, setAuthToken };
