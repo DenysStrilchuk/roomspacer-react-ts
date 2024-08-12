@@ -21,9 +21,21 @@ const Login: React.FC = () => {
         dispatch(authActions.login({ email, password }));
     };
 
-    const handleGoogleLogin = () => {
-        dispatch(authActions.loginWithGoogle());
+    const handleGoogleLogin = async () => {
+        try {
+            const { user } = await dispatch(authActions.loginWithGoogle()).unwrap();
+            if (!user) {
+                alert('User not found. Please register first.');
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                alert(error.message || 'Sign in with Google failed.');
+            } else {
+                alert('Sign in with Google failed.');
+            }
+        }
     };
+
 
     const handleForgotPassword = () => {
         navigate('/auth/recovery');

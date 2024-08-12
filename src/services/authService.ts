@@ -107,22 +107,29 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
 
 const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     try {
+        // Використання Firebase для аутентифікації користувача через Google
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        // Отримання токену доступу користувача
-        const token = await user.getIdToken();
+        // Отримання токену доступу від Firebase
+        const idToken = await user.getIdToken();
 
-        // Перетворюємо об'єкт User від Firebase у відповідність до інтерфейсу IUser
+        // Відправка `idToken` на бекенд для входу
+        const response = await axiosInstance.post(urls.loginWithGoogle.base, { idToken });
+
+        // Перетворюємо відповідь бекенду у відповідність до інтерфейсу IUser
         const transformedUser: IUser = {
-            id: user.uid, // Використовуємо `uid` як `id`
-            name: user.displayName || '', // `displayName` може бути null, тому забезпечуємо значення по замовчуванню
-            email: user.email || '', // `email` також може бути null
-            createdAt: new Date(), // Тут вам, можливо, потрібно буде отримати або зберегти фактичну дату створення
-            updatedAt: new Date() // Оновлюється при кожному вході
+            id: response.data.user.uid,
+            name: response.data.user.displayName,
+            email: response.data.user.email,
+            createdAt: new Date(response.data.user.metadata.creationTime),
+            updatedAt: new Date(response.data.user.metadata.lastSignInTime),
         };
 
-        return { user: transformedUser, token };
+        // Зберігаємо токен для подальших запитів
+        setAuthToken(response.data.token);
+
+        return { user: transformedUser, token: response.data.token };
     } catch (error) {
         console.error('Google Sign-In error:', error);
         throw error;

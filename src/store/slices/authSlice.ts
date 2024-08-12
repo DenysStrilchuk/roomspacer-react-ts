@@ -150,6 +150,9 @@ const authSlice = createSlice({
             state.token = null;
             state.isLogin = false;
         },
+        setToken: (state, action) => {
+            state.token = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder

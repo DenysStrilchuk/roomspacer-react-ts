@@ -7,8 +7,6 @@ import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
-import { signInWithPopup } from 'firebase/auth';
-import {auth, provider} from "../../../firebase/firebaseConfig"; // Імпортуємо метод для Google Sign-In
 
 interface IFormErrors {
     name?: string;
@@ -66,15 +64,22 @@ const Register: React.FC = () => {
 
     const handleGoogleSignUp = async () => {
         try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            console.log('User signed in with Google:', user);
-            // Додайте логіку для обробки реєстрації через Google на вашому бекенді
+            const { user, token } = await dispatch(authActions.registerWithGoogle()).unwrap();
+            if (user) {
+                // Зберігаємо токен у стані додатку
+                dispatch(authActions.setToken(token));
+
+                console.log('User registered and logged in with Google:', user);
+            } else {
+                setFormErrors({ global: 'Google registration failed' });
+            }
         } catch (error) {
-            console.error('Error during Google sign-in:', error);
-            setFormErrors({ global: 'Google sign-in failed' });
+            console.error('Error during Google sign-up:', error);
+            setFormErrors({ global: 'Google sign-up failed' });
         }
     };
+
+
 
     useEffect(() => {
         if (isRegistered) {
