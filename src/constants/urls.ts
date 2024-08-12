@@ -5,6 +5,7 @@ const register = '/auth/register';
 const confirmEmail = '/auth/confirm';
 const forgotPassword = '/auth/forgot-password';
 const resetPassword = '/auth/reset-password';
+const registerWithGoogle = '/auth/register-with-google';
 
 const urls = {
     login: {
@@ -21,6 +22,9 @@ const urls = {
     },
     resetPassword: {
         base: resetPassword
+    },
+    registerWithGoogle: {
+        base: registerWithGoogle
     }
 };
 

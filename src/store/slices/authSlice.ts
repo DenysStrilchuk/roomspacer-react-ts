@@ -89,6 +89,58 @@ const resetPassword = createAsyncThunk<
     }
 );
 
+const loginWithGoogle = createAsyncThunk<
+    { user: IUser; token: string },
+    void,
+    { rejectValue: IErrorResponse }
+>(
+    'authSlice/loginWithGoogle',
+    async (_, { rejectWithValue }) => {
+        try {
+            const data = await authService.loginWithGoogle();
+
+            // Перетворюємо об'єкт User у відповідність до інтерфейсу IUser
+            const transformedUser: IUser = {
+                id: data.user.id,
+                name: data.user.name,
+                email: data.user.email,
+                createdAt: data.user.createdAt,
+                updatedAt: data.user.updatedAt,
+            };
+
+            return { user: transformedUser, token: data.token };
+        } catch (e) {
+            return rejectWithValue(handleAxiosError(e));
+        }
+    }
+);
+
+const registerWithGoogle = createAsyncThunk<
+    { user: IUser; token: string },
+    void,
+    { rejectValue: IErrorResponse }
+>(
+    'authSlice/registerWithGoogle',
+    async (_, { rejectWithValue }) => {
+        try {
+            const data = await authService.registerWithGoogle();
+
+            const transformedUser: IUser = {
+                id: data.user.id,
+                name: data.user.name,
+                email: data.user.email,
+                createdAt: data.user.createdAt,
+                updatedAt: data.user.updatedAt,
+            };
+
+            return { user: transformedUser, token: data.token };
+        } catch (e) {
+            return rejectWithValue(handleAxiosError(e));
+        }
+    }
+);
+
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -153,7 +205,38 @@ const authSlice = createSlice({
             .addCase(resetPassword.rejected, (state, action) => {
                 state.error = action.payload || { message: 'Failed to reset password' };
                 state.loading = false;
+            })
+            .addCase(loginWithGoogle.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.isLogin = false;
+            })
+            .addCase(loginWithGoogle.fulfilled, (state, action) => {
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                state.loading = false;
+                state.isLogin = true;
+            })
+            .addCase(loginWithGoogle.rejected, (state, action) => {
+                state.error = action.payload || { message: 'Login with Google failed' };
+                state.loading = false;
+                state.isLogin = false;
+            })
+            .addCase(registerWithGoogle.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(registerWithGoogle.fulfilled, (state, action) => {
+                state.user = action.payload.user;
+                state.token = action.payload.token;
+                state.loading = false;
+                state.isRegistered = true;
+            })
+            .addCase(registerWithGoogle.rejected, (state, action) => {
+                state.error = action.payload || { message: 'Registration with Google failed' };
+                state.loading = false;
             });
+
     },
 });
 
@@ -164,6 +247,8 @@ const authActions = {
     register,
     forgotPassword,
     resetPassword,
+    loginWithGoogle,
+    registerWithGoogle,
 };
 
 export {
