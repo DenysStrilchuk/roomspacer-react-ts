@@ -26,7 +26,7 @@ const handleAxiosError = (e: unknown): IErrorResponse => {
     return error.response?.data || { message: 'An error occurred' };
 };
 
-// Existing async thunks for email/password authentication
+// Async thunks for email/password authentication
 const login = createAsyncThunk<
     { user: IUser; token: string },
     { email: string; password: string },
@@ -89,6 +89,7 @@ const resetPassword = createAsyncThunk<
     }
 );
 
+// Async thunks for Google authentication
 const loginWithGoogle = createAsyncThunk<
     { user: IUser; token: string },
     void,
@@ -98,16 +99,12 @@ const loginWithGoogle = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
             const data = await authService.loginWithGoogle();
-
-            // Перетворюємо об'єкт User у відповідність до інтерфейсу IUser
             const transformedUser: IUser = {
-                id: data.user.id,
+                uid: data.user.uid,
                 name: data.user.name,
                 email: data.user.email,
-                createdAt: data.user.createdAt,
-                updatedAt: data.user.updatedAt,
+                picture: data.user.picture,
             };
-
             return { user: transformedUser, token: data.token };
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
@@ -124,22 +121,18 @@ const registerWithGoogle = createAsyncThunk<
     async (_, { rejectWithValue }) => {
         try {
             const data = await authService.registerWithGoogle();
-
             const transformedUser: IUser = {
-                id: data.user.id,
+                uid: data.user.uid,
                 name: data.user.name,
                 email: data.user.email,
-                createdAt: data.user.createdAt,
-                updatedAt: data.user.updatedAt,
+                picture: data.user.picture,
             };
-
             return { user: transformedUser, token: data.token };
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
         }
     }
 );
-
 
 const authSlice = createSlice({
     name: 'auth',
@@ -239,7 +232,6 @@ const authSlice = createSlice({
                 state.error = action.payload || { message: 'Registration with Google failed' };
                 state.loading = false;
             });
-
     },
 });
 
