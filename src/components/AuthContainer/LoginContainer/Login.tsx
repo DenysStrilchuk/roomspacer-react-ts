@@ -5,24 +5,34 @@ import { useAppDispatch } from '../../../hooks';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { Oval } from 'react-loader-spinner';
 import css from './Login.module.css';
 
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
-    const { isLogin, loading, error } = useSelector((state: RootState) => state.auth);
+    const { isLogin, error } = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [googleLoginError, setGoogleLoginError] = useState<string | null>(null);
+    const [loadingEmail, setLoadingEmail] = useState(false);
+    const [loadingGoogle, setLoadingGoogle] = useState(false);
 
-
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        dispatch(authActions.login({ email, password }));
+        setLoadingEmail(true);
+        try {
+            await dispatch(authActions.login({ email, password })).unwrap();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoadingEmail(false);
+        }
     };
 
     const handleGoogleLogin = async () => {
+        setLoadingGoogle(true);
         try {
             const { user } = await dispatch(authActions.loginWithGoogle()).unwrap();
             if (!user) {
@@ -34,9 +44,10 @@ const Login: React.FC = () => {
             } else {
                 setGoogleLoginError('Sign in with Google failed.');
             }
+        } finally {
+            setLoadingGoogle(false);
         }
     };
-
 
     const handleForgotPassword = () => {
         navigate('/auth/recovery');
@@ -85,8 +96,18 @@ const Login: React.FC = () => {
                 {error?.message && <p className={css.errorMessage}>{error.message}</p>}
 
                 <div className={css.loginButtonContainer}>
-                    <button type="submit" disabled={loading} className={css.loginButton}>
-                        Sign In
+                    <button type="submit" disabled={loadingEmail} className={css.loginButton}>
+                        {loadingEmail ? (
+                            <Oval
+                                height={24}
+                                width={24}
+                                color="#ffffff"
+                                secondaryColor="#ffffff"
+                                strokeWidth={2}
+                            />
+                        ) : (
+                            'Sign In'
+                        )}
                     </button>
                 </div>
 
@@ -100,11 +121,22 @@ const Login: React.FC = () => {
                     <button
                         type="button"
                         className={css.googleButton}
-                        onClick={handleGoogleLogin} // Виклик логіна через Google
+                        onClick={handleGoogleLogin}
+                        disabled={loadingGoogle}
                     >
                         <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
                              alt={'googleIcon'} className={css.googleIcon}/>
-                        Sign in with Google
+                        {loadingGoogle ? (
+                            <Oval
+                                height={24}
+                                width={24}
+                                color="rgb(70, 77, 97)"
+                                secondaryColor="rgb(70, 77, 97)"
+                                strokeWidth={2}
+                            />
+                        ) : (
+                            'Sign in with Google'
+                        )}
                     </button>
                     {googleLoginError && <p className={css.errorMessage}>{googleLoginError}</p>}
                 </div>
