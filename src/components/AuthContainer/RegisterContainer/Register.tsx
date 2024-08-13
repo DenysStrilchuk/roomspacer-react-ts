@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { authActions, RootState } from '../../../store';
-import { useAppDispatch } from '../../../hooks';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
+import {authActions, RootState} from '../../../store';
+import {useAppDispatch} from '../../../hooks';
 import css from './Register.module.css';
-import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
+import {faEnvelope, faUser, faLock, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {Link, useNavigate} from 'react-router-dom';
 
 interface IFormErrors {
     name?: string;
@@ -17,7 +17,7 @@ interface IFormErrors {
 
 const Register: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { isRegistered, loading, error } = useSelector((state: RootState) => state.auth);
+    const {isRegistered, loading, error} = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,6 +27,9 @@ const Register: React.FC = () => {
     const [formErrors, setFormErrors] = useState<IFormErrors>({});
     const [showConfirmationMessage, setShowConfirmationMessage] = useState(false);
     const [agreeToTerms, setAgreeToTerms] = useState(false);
+    const navigate = useNavigate();
+    const [registrationType, setRegistrationType] = useState<'normal' | 'google'>('normal');
+
 
     const validateForm = () => {
         const newErrors: IFormErrors = {};
@@ -54,7 +57,7 @@ const Register: React.FC = () => {
         }
         setFormErrors({});
         try {
-            await dispatch(authActions.register({ email, password, name })).unwrap();
+            await dispatch(authActions.register({email, password, name})).unwrap();
             setShowConfirmationMessage(true);
         } catch (err) {
             console.error('Error during registration:', err);
@@ -63,22 +66,24 @@ const Register: React.FC = () => {
 
     const handleGoogleSignUp = async () => {
         try {
-            const { user, token } = await dispatch(authActions.registerWithGoogle()).unwrap();
+            const {user, token} = await dispatch(authActions.registerWithGoogle()).unwrap();
             if (user) {
-                // Зберігаємо токен у стані додатку
                 dispatch(authActions.setToken(token));
-
-                console.log('User registered and logged in with Google:', user);
+                setRegistrationType('google');
+                setShowConfirmationMessage(true);
             } else {
-                setFormErrors({ global: 'Google registration failed' });
+                setFormErrors({global: 'Google registration failed'});
             }
         } catch (error) {
             console.error('Error during Google sign-up:', error);
-            setFormErrors({ global: 'Google sign-up failed' });
+            setFormErrors({global: 'Google sign-up failed'});
         }
     };
 
-
+    const handleCloseModal = () => {
+        setShowConfirmationMessage(false);
+        navigate('/auth/login'); // Перенаправлення на сторінку логіну
+    };
 
     useEffect(() => {
         if (isRegistered) {
@@ -88,7 +93,7 @@ const Register: React.FC = () => {
 
     useEffect(() => {
         if (error) {
-            const newErrors: IFormErrors = { global: error.message || 'Registration failed' };
+            const newErrors: IFormErrors = {global: error.message || 'Registration failed'};
 
             if (error.errors) {
                 if (error.errors.email) {
@@ -108,7 +113,7 @@ const Register: React.FC = () => {
             <form onSubmit={handleSubmit} className={css.registerForm}>
                 <h2>Sign Up</h2>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faUser} className={css.icon} />
+                    <FontAwesomeIcon icon={faUser} className={css.icon}/>
                     <input
                         type="text"
                         placeholder="Full name"
@@ -119,7 +124,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
+                    <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
                     <input
                         type="email"
                         placeholder="Email address"
@@ -130,7 +135,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon} />
+                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
                     <input
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
@@ -146,7 +151,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon} />
+                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
                     <input
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm Password"
@@ -170,7 +175,9 @@ const Register: React.FC = () => {
                         className={css.checkboxInput}
                     />
                     <label htmlFor="agreeToTerms" className={css.checkboxLabel}>
-                        I agree to <a href="/terms" className={css.link}>Terms</a>, <a href="/privacy" className={css.link}>Privacy</a>, and <a href="/cookies" className={css.link}>Cookie policies</a>.
+                        I agree to <a href="/terms" className={css.link}>Terms</a>,
+                        <a href="/privacy" className={css.link}>Privacy</a>,
+                        and <a href="/cookies" className={css.link}>Cookie policies</a>.
                     </label>
                 </div>
                 {formErrors.name && <p className={css.errorText}>{formErrors.name}</p>}
@@ -190,7 +197,10 @@ const Register: React.FC = () => {
                 </div>
 
                 <div className={css.googleButtonContainer}>
-                    <button type="button" className={css.googleButton} onClick={handleGoogleSignUp}>
+                    <button type="button"
+                            className={css.googleButton}
+                            onClick={handleGoogleSignUp}
+                            disabled={!agreeToTerms}>
                         <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
                              alt={'googleIcon'} className={css.googleIcon}/>
                         Sign up with Google
@@ -207,8 +217,14 @@ const Register: React.FC = () => {
                 <div className={css.modalOverlay}>
                     <div className={`${css.confirmationMessage} ${css.fadeIn}`}>
                         <h2>Registration Successful!</h2>
-                        <p>A confirmation email has been sent. Please check your inbox to verify your email address.</p>
-                        <button className={css.modalButton} onClick={() => setShowConfirmationMessage(false)}>
+                        {registrationType === 'normal' ? (
+                            <p>A confirmation email has been sent. Please check your inbox to verify your
+                                email address.</p>
+                        ) : (
+                            <p>You have successfully registered with Google. To enter the application,
+                                click on the button 'Sign in with Google'</p>
+                        )}
+                        <button className={css.modalButton} onClick={handleCloseModal}>
                             Ok
                         </button>
                     </div>
@@ -218,4 +234,4 @@ const Register: React.FC = () => {
     );
 };
 
-export { Register };
+export {Register};

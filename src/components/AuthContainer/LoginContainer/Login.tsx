@@ -14,6 +14,8 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [googleLoginError, setGoogleLoginError] = useState<string | null>(null);
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,13 +26,13 @@ const Login: React.FC = () => {
         try {
             const { user } = await dispatch(authActions.loginWithGoogle()).unwrap();
             if (!user) {
-                alert('User not found. Please register first.');
+                setGoogleLoginError('User not found. Please register first.');
             }
         } catch (error) {
             if (error instanceof Error) {
-                alert(error.message || 'Sign in with Google failed.');
+                setGoogleLoginError(error.message || 'Sign in with Google failed.');
             } else {
-                alert('Sign in with Google failed.');
+                setGoogleLoginError('Sign in with Google failed.');
             }
         }
     };
@@ -104,6 +106,7 @@ const Login: React.FC = () => {
                              alt={'googleIcon'} className={css.googleIcon}/>
                         Sign in with Google
                     </button>
+                    {googleLoginError && <p className={css.errorMessage}>{googleLoginError}</p>}
                 </div>
 
                 <div className={css.signUpContainer}>
