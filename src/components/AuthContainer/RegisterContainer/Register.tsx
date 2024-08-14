@@ -216,7 +216,7 @@ const Register: React.FC = () => {
                             handleButtonClick(e);
                             if (agreeToTerms) {
                                 try {
-                                    await handleGoogleSignUp(); // Чекаємо на виконання Promise
+                                    await handleGoogleSignUp();
                                 } catch (error) {
                                     console.error('Error during Google sign-up:', error);
                                 }
