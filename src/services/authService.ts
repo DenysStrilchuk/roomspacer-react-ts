@@ -58,10 +58,11 @@ const login = async (email: string, password: string): Promise<ILoginResponse> =
 // Забули пароль
 const forgotPassword = async (email: string) => {
     try {
-        await axiosInstance.post(urls.forgotPassword.base, { email });
-    } catch (error) {
-        console.error('Помилка відновлення паролю:', error);
-        throw error;
+        const response = await axiosInstance.post(urls.forgotPassword.base, { email });
+        return response.data;
+    } catch (error: any) {
+        console.error('Помилка відновлення паролю:', error.response?.data?.message || error.message);
+        throw new Error(error.response?.data?.message || error.message);
     }
 };
 

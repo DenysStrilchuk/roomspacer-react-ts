@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
-import { authService } from '../../services';
-import { IErrorResponse, IUser } from '../../interfaces';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {AxiosError} from 'axios';
+import {authService} from '../../services';
+import {IErrorResponse, IUser} from '../../interfaces';
 
 interface IAuthState {
     user: IUser | null;
@@ -23,7 +23,7 @@ const initialState: IAuthState = {
 
 const handleAxiosError = (e: unknown): IErrorResponse => {
     const error = e as AxiosError<IErrorResponse>;
-    return error.response?.data || { message: 'An error occurred' };
+    return error.response?.data || {message: 'An error occurred'};
 };
 
 // Async thunks for email/password authentication
@@ -33,10 +33,10 @@ const login = createAsyncThunk<
     { rejectValue: IErrorResponse }
 >(
     'authSlice/login',
-    async ({ email, password }, { rejectWithValue }) => {
+    async ({email, password}, {rejectWithValue}) => {
         try {
             const data = await authService.login(email, password);
-            return { user: data.user, token: data.token };
+            return {user: data.user, token: data.token};
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
         }
@@ -49,10 +49,10 @@ const register = createAsyncThunk<
     { rejectValue: IErrorResponse }
 >(
     'authSlice/register',
-    async ({ email, password, name }, { rejectWithValue }) => {
+    async ({email, password, name}, {rejectWithValue}) => {
         try {
             const data = await authService.register(email, password, name);
-            return { user: data.user, token: data.token };
+            return {user: data.user, token: data.token};
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
         }
@@ -68,8 +68,9 @@ const forgotPassword = createAsyncThunk<
     async ({ email }, { rejectWithValue }) => {
         try {
             await authService.forgotPassword(email);
-        } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+        } catch (e: any) {
+            // Return an object with a message instead of just a string
+            return rejectWithValue({ message: e.message || 'Помилка відновлення паролю' });
         }
     }
 );
@@ -80,7 +81,7 @@ const resetPassword = createAsyncThunk<
     { rejectValue: IErrorResponse }
 >(
     'authSlice/resetPassword',
-    async ({ token, newPassword }, { rejectWithValue }) => {
+    async ({token, newPassword}, {rejectWithValue}) => {
         try {
             await authService.resetPassword(token, newPassword);
         } catch (e) {
@@ -96,7 +97,7 @@ const loginWithGoogle = createAsyncThunk<
     { rejectValue: IErrorResponse }
 >(
     'authSlice/loginWithGoogle',
-    async (_, { rejectWithValue }) => {
+    async (_, {rejectWithValue}) => {
         try {
             const data = await authService.loginWithGoogle();
             const transformedUser: IUser = {
@@ -105,7 +106,7 @@ const loginWithGoogle = createAsyncThunk<
                 email: data.user.email,
                 picture: data.user.picture,
             };
-            return { user: transformedUser, token: data.token };
+            return {user: transformedUser, token: data.token};
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
         }
@@ -118,7 +119,7 @@ const registerWithGoogle = createAsyncThunk<
     { rejectValue: IErrorResponse }
 >(
     'authSlice/registerWithGoogle',
-    async (_, { rejectWithValue }) => {
+    async (_, {rejectWithValue}) => {
         try {
             const data = await authService.registerWithGoogle();
             const transformedUser: IUser = {
@@ -127,7 +128,7 @@ const registerWithGoogle = createAsyncThunk<
                 email: data.user.email,
                 picture: data.user.picture,
             };
-            return { user: transformedUser, token: data.token };
+            return {user: transformedUser, token: data.token};
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
         }
@@ -161,7 +162,7 @@ const authSlice = createSlice({
                 state.isLogin = true;
             })
             .addCase(login.rejected, (state, action) => {
-                state.error = action.payload || { message: 'Login failed' };
+                state.error = action.payload || {message: 'Login failed'};
                 state.loading = false;
                 state.isLogin = false;
             })
@@ -178,7 +179,7 @@ const authSlice = createSlice({
             })
             .addCase(register.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || { message: 'Registration failed' };
+                state.error = action.payload || {message: 'Registration failed'};
             })
             .addCase(forgotPassword.pending, (state) => {
                 state.loading = true;
@@ -188,8 +189,8 @@ const authSlice = createSlice({
                 state.loading = false;
             })
             .addCase(forgotPassword.rejected, (state, action) => {
-                state.error = action.payload || { message: 'Failed to send reset link' };
                 state.loading = false;
+                state.error = action.payload || { message: 'Помилка відновлення паролю' };
             })
             .addCase(resetPassword.pending, (state) => {
                 state.loading = true;
@@ -199,7 +200,7 @@ const authSlice = createSlice({
                 state.loading = false;
             })
             .addCase(resetPassword.rejected, (state, action) => {
-                state.error = action.payload || { message: 'Failed to reset password' };
+                state.error = action.payload || {message: 'Failed to reset password'};
                 state.loading = false;
             })
             .addCase(loginWithGoogle.pending, (state) => {
@@ -214,7 +215,7 @@ const authSlice = createSlice({
                 state.isLogin = true;
             })
             .addCase(loginWithGoogle.rejected, (state, action) => {
-                state.error = action.payload || { message: 'Login with Google failed' };
+                state.error = action.payload || {message: 'Login with Google failed'};
                 state.loading = false;
                 state.isLogin = false;
             })
@@ -229,13 +230,13 @@ const authSlice = createSlice({
                 state.isRegistered = true;
             })
             .addCase(registerWithGoogle.rejected, (state, action) => {
-                state.error = action.payload || { message: 'Registration with Google failed' };
+                state.error = action.payload || {message: 'Registration with Google failed'};
                 state.loading = false;
             });
     },
 });
 
-const { reducer: authReducer, actions } = authSlice;
+const {reducer: authReducer, actions} = authSlice;
 const authActions = {
     ...actions,
     login,

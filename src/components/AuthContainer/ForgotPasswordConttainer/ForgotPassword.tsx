@@ -19,17 +19,19 @@ const ForgotPassword = () => {
         try {
             await dispatch(authActions.forgotPassword({ email })).unwrap();
             setStatus('success');
-            setMessage('Password reset link sent successfully.');
-        } catch (error) {
+            setMessage('Посилання для скидання паролю було надіслано на вашу пошту.');
+        } catch (error: any) {
             setStatus('error');
-            setMessage('An error occurred. Please try again.');
+            setMessage(error?.message || 'Сталася помилка. Будь ласка, спробуйте ще раз.');
         }
     };
+
+
 
     return (
         <div className={css.forgotPasswordContainer}>
             <form onSubmit={handleSubmit} className={css.forgotPasswordForm}>
-                <h2>Forgot password</h2>
+                <h2>Відновлення паролю</h2>
                 <div className={css.inputContainer}>
                     <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
                     <input
@@ -46,7 +48,7 @@ const ForgotPassword = () => {
                     className={css.forgotPasswordButton}
                     disabled={status === 'loading'}
                 >
-                    {status === 'loading' ? 'Sending...' : 'Send a link'}
+                    {status === 'loading' ? 'Відправляємо...' : 'Надіслати посилання'}
                 </button>
                 {message && (
                     <p
