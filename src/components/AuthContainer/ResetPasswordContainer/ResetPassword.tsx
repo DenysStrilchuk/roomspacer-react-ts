@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch } from '../../../hooks';
 import { authActions } from '../../../store';
+import { ClipLoader } from 'react-spinners';
 
 interface IFormErrors {
     password?: string;
@@ -107,7 +108,14 @@ const ResetPassword = () => {
                     className={css.resetPasswordButton}
                     disabled={status === 'loading'}
                 >
-                    {status === 'loading' ? 'Change...' : 'Change password'}
+                    {status === 'loading' ? (
+                        <div className={css.loadingContainer}>
+                            <span>Change...</span>
+                            <ClipLoader size={20} color={"#ffffff"} loading={true} />
+                        </div>
+                    ) : (
+                        'Change password'
+                    )}
                 </button>
                 {status === 'success' && (
                     <p className={css.successMessage}>{successMessage}</p>

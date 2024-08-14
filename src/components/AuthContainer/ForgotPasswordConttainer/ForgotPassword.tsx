@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch } from '../../../hooks';
 import { authActions } from '../../../store';
+import { ClipLoader } from 'react-spinners';
 
 const ForgotPassword = () => {
     const dispatch = useAppDispatch();
@@ -26,8 +27,6 @@ const ForgotPassword = () => {
         }
     };
 
-
-
     return (
         <div className={css.forgotPasswordContainer}>
             <form onSubmit={handleSubmit} className={css.forgotPasswordForm}>
@@ -48,7 +47,14 @@ const ForgotPassword = () => {
                     className={css.forgotPasswordButton}
                     disabled={status === 'loading'}
                 >
-                    {status === 'loading' ? 'Sending...' : 'Send a link'}
+                    {status === 'loading' ? (
+                        <div className={css.loadingContainer}>
+                            <span>Sending...</span>
+                            <ClipLoader size={20} color={"#ffffff"} loading={true} />
+                        </div>
+                    ) : (
+                        'Send a link'
+                    )}
                 </button>
                 {message && (
                     <p

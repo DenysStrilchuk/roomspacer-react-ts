@@ -177,3 +177,13 @@
 .signUpLink:hover {
     text-decoration: underline;
 }
+
+.loadingContainer {
+    display: flex;
+    align-items: center; /* Vertically center the spinner and text */
+    justify-content: center;
+}
+
+.loadingContainer span {
+    margin-right: 8px; /* Space between the text and spinner */
+}

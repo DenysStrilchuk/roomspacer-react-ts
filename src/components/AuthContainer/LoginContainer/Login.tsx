@@ -5,7 +5,7 @@ import { useAppDispatch } from '../../../hooks';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Oval } from 'react-loader-spinner';
+import { ClipLoader } from 'react-spinners'; // Додано
 import css from './Login.module.css';
 
 const Login: React.FC = () => {
@@ -98,13 +98,10 @@ const Login: React.FC = () => {
                 <div className={css.loginButtonContainer}>
                     <button type="submit" disabled={loadingEmail} className={css.loginButton}>
                         {loadingEmail ? (
-                            <Oval
-                                height={24}
-                                width={24}
-                                color="#ffffff"
-                                secondaryColor="#ffffff"
-                                strokeWidth={2}
-                            />
+                            <div className={css.loadingContainer}>
+                                <span>Signing in...</span>
+                                <ClipLoader size={20} color={"#ffffff"} loading={true} />
+                            </div>
                         ) : (
                             'Sign In'
                         )}
@@ -127,13 +124,10 @@ const Login: React.FC = () => {
                         <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
                              alt={'googleIcon'} className={css.googleIcon}/>
                         {loadingGoogle ? (
-                            <Oval
-                                height={24}
-                                width={24}
-                                color="rgb(70, 77, 97)"
-                                secondaryColor="rgb(70, 77, 97)"
-                                strokeWidth={2}
-                            />
+                            <div className={css.loadingContainer}>
+                                <span>Signing in with Google...</span>
+                                <ClipLoader size={20} color={"rgb(70, 77, 97)"} loading={true} />
+                            </div>
                         ) : (
                             'Sign in with Google'
                         )}

@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
-import {authActions, RootState} from '../../../store';
-import {useAppDispatch} from '../../../hooks';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { authActions, RootState } from '../../../store';
+import { useAppDispatch } from '../../../hooks';
 import css from './Register.module.css';
-import {faEnvelope, faUser, faLock, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {Link, useNavigate} from 'react-router-dom';
+import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link, useNavigate } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners';
 
 interface IFormErrors {
     name?: string;
@@ -17,7 +18,7 @@ interface IFormErrors {
 
 const Register: React.FC = () => {
     const dispatch = useAppDispatch();
-    const {isRegistered, loading, error} = useSelector((state: RootState) => state.auth);
+    const { isRegistered, error } = useSelector((state: RootState) => state.auth);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -30,7 +31,8 @@ const Register: React.FC = () => {
     const navigate = useNavigate();
     const [registrationType, setRegistrationType] = useState<'normal' | 'google'>('normal');
     const [buttonError, setButtonError] = useState<string | null>(null);
-
+    const [loading, setLoading] = useState(false); // Loading state for "Create your free account"
+    const [googleLoading, setGoogleLoading] = useState(false); // Loading state for "Sign up with Google"
 
     const validateForm = () => {
         const newErrors: IFormErrors = {};
@@ -66,33 +68,39 @@ const Register: React.FC = () => {
             return;
         }
         setFormErrors({});
+        setLoading(true); // Start loading spinner for "Create your free account"
         try {
-            await dispatch(authActions.register({email, password, name})).unwrap();
+            await dispatch(authActions.register({ email, password, name })).unwrap();
             setShowConfirmationMessage(true);
         } catch (err) {
             console.error('Error during registration:', err);
+        } finally {
+            setLoading(false); // Stop loading spinner for "Create your free account"
         }
     };
 
     const handleGoogleSignUp = async () => {
+        setGoogleLoading(true); // Start loading spinner for "Sign up with Google"
         try {
-            const {user, token} = await dispatch(authActions.registerWithGoogle()).unwrap();
+            const { user, token } = await dispatch(authActions.registerWithGoogle()).unwrap();
             if (user) {
                 dispatch(authActions.setToken(token));
                 setRegistrationType('google');
                 setShowConfirmationMessage(true);
             } else {
-                setFormErrors({global: 'Google registration failed'});
+                setFormErrors({ global: 'Google registration failed' });
             }
         } catch (error) {
             console.error('Error during Google sign-up:', error);
-            setFormErrors({global: 'Google sign-up failed'});
+            setFormErrors({ global: 'Google sign-up failed' });
+        } finally {
+            setGoogleLoading(false); // Stop loading spinner for "Sign up with Google"
         }
     };
 
     const handleCloseModal = () => {
         setShowConfirmationMessage(false);
-        navigate('/auth/login'); // Перенаправлення на сторінку логіну
+        navigate('/auth/login'); // Redirect to login page
     };
 
     useEffect(() => {
@@ -103,7 +111,7 @@ const Register: React.FC = () => {
 
     useEffect(() => {
         if (error) {
-            const newErrors: IFormErrors = {global: error.message || 'Registration failed'};
+            const newErrors: IFormErrors = { global: error.message || 'Registration failed' };
 
             if (error.errors) {
                 if (error.errors.email) {
@@ -123,7 +131,7 @@ const Register: React.FC = () => {
             <form onSubmit={handleSubmit} className={css.registerForm}>
                 <h2>Sign Up</h2>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faUser} className={css.icon}/>
+                    <FontAwesomeIcon icon={faUser} className={css.icon} />
                     <input
                         type="text"
                         placeholder="Full name"
@@ -134,7 +142,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
+                    <FontAwesomeIcon icon={faEnvelope} className={css.icon} />
                     <input
                         type="email"
                         placeholder="Email address"
@@ -145,7 +153,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
+                    <FontAwesomeIcon icon={faLock} className={css.icon} />
                     <input
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Password"
@@ -161,7 +169,7 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className={css.inputContainer}>
-                    <FontAwesomeIcon icon={faLock} className={css.icon}/>
+                    <FontAwesomeIcon icon={faLock} className={css.icon} />
                     <input
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirm Password"
@@ -196,9 +204,15 @@ const Register: React.FC = () => {
                 {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
                 {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
 
-                <button type="submit" className={css.registerButton} onClick={handleButtonClick}
-                        >
-                    {loading ? 'Creating...' : 'Create your free account'}
+                <button type="submit" className={css.registerButton} onClick={handleButtonClick}>
+                    {loading ? (
+                        <div className={css.loadingContainer}>
+                            <span>Creating...</span>
+                            <ClipLoader size={20} color={"#ffffff"} loading={true} />
+                        </div>
+                    ) : (
+                        'Create your free account'
+                    )}
                 </button>
 
                 <div className={css.divider}>
@@ -206,7 +220,6 @@ const Register: React.FC = () => {
                     <span className={css.orText}>Or</span>
                     <span className={css.line}></span>
                 </div>
-
 
                 <div className={css.googleButtonContainer}>
                     <button
@@ -222,10 +235,22 @@ const Register: React.FC = () => {
                                 }
                             }
                         }}
+                        disabled={googleLoading} // Disable the button during the loading state
                     >
+                        <div className={css.loadingContainer}>
+
+
                         <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
-                             alt={'googleIcon'} className={css.googleIcon}/>
-                        Sign up with Google
+                                 alt={'googleIcon'} className={css.googleIcon}/>
+                            {googleLoading ? (
+                                <>
+                                    <span>Signing up with Google...</span>
+                                    <ClipLoader size={20} color={"rgb(70,77,97)"} loading={true}/>
+                                </>
+                            ) : (
+                                <span>Sign up with Google</span>
+                            )}
+                        </div>
                     </button>
                 </div>
 
