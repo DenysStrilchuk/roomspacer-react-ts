@@ -29,6 +29,7 @@ const Register: React.FC = () => {
     const [agreeToTerms, setAgreeToTerms] = useState(false);
     const navigate = useNavigate();
     const [registrationType, setRegistrationType] = useState<'normal' | 'google'>('normal');
+    const [buttonError, setButtonError] = useState<string | null>(null);
 
 
     const validateForm = () => {
@@ -46,6 +47,15 @@ const Register: React.FC = () => {
             newErrors.global = 'You must agree to the terms and policies';
         }
         return newErrors;
+    };
+
+    const handleButtonClick = (e: React.MouseEvent) => {
+        if (!agreeToTerms) {
+            e.preventDefault();
+            setButtonError('You must agree to the terms and policies before proceeding.');
+        } else {
+            setButtonError(null);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -186,7 +196,8 @@ const Register: React.FC = () => {
                 {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
                 {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
 
-                <button type="submit" className={css.registerButton} disabled={loading || !agreeToTerms}>
+                <button type="submit" className={css.registerButton} onClick={handleButtonClick}
+                        >
                     {loading ? 'Creating...' : 'Create your free account'}
                 </button>
 
@@ -196,16 +207,30 @@ const Register: React.FC = () => {
                     <span className={css.line}></span>
                 </div>
 
+
                 <div className={css.googleButtonContainer}>
-                    <button type="button"
-                            className={css.googleButton}
-                            onClick={handleGoogleSignUp}
-                            disabled={!agreeToTerms}>
+                    <button
+                        type="button"
+                        className={css.googleButton}
+                        onClick={async (e) => {
+                            handleButtonClick(e);
+                            if (agreeToTerms) {
+                                try {
+                                    await handleGoogleSignUp(); // Чекаємо на виконання Promise
+                                } catch (error) {
+                                    console.error('Error during Google sign-up:', error);
+                                }
+                            }
+                        }}
+                    >
                         <img src={"https://img.icons8.com/?size=100&id=17949&format=png&color=000000"}
                              alt={'googleIcon'} className={css.googleIcon}/>
                         Sign up with Google
                     </button>
                 </div>
+
+
+                {buttonError && <p className={css.errorText}>{buttonError}</p>}
 
                 <div className={css.signInContainer}>
                     <p className={css.haveAccountText}>Already have an account?</p>
