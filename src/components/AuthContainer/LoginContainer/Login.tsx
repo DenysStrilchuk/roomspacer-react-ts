@@ -5,7 +5,7 @@ import { useAppDispatch } from '../../../hooks';
 import { useNavigate, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { ClipLoader } from 'react-spinners'; // Додано
+import { ClipLoader } from 'react-spinners';
 import css from './Login.module.css';
 import {setAuthToken} from "../../../services";
 
