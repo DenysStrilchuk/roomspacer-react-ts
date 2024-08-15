@@ -7,6 +7,7 @@ const forgotPassword = '/auth/forgot-password';
 const resetPassword = '/auth/reset-password';
 const registerWithGoogle = '/auth/register-with-google';
 const loginWithGoogle = '/auth/login-with-google';
+const checkToken = '/auth/check-token';
 
 const urls = {
     login: {
@@ -29,6 +30,9 @@ const urls = {
     },
     loginWithGoogle: {
         base: loginWithGoogle
+    },
+    checkToken: {
+        base: checkToken
     }
 };
 

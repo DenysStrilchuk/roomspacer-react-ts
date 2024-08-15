@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { ClipLoader } from 'react-spinners'; // Додано
 import css from './Login.module.css';
+import {setAuthToken} from "../../../services";
 
 const Login: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -23,7 +24,10 @@ const Login: React.FC = () => {
         e.preventDefault();
         setLoadingEmail(true);
         try {
-            await dispatch(authActions.login({ email, password })).unwrap();
+            const { token } = await dispatch(authActions.login({ email, password })).unwrap();
+            // Store token in localStorage and set it in auth headers
+            localStorage.setItem('token', token);
+            setAuthToken(token);
         } catch (error) {
             console.error(error);
         } finally {
@@ -34,9 +38,13 @@ const Login: React.FC = () => {
     const handleGoogleLogin = async () => {
         setLoadingGoogle(true);
         try {
-            const { user } = await dispatch(authActions.loginWithGoogle()).unwrap();
+            const { user, token } = await dispatch(authActions.loginWithGoogle()).unwrap();
             if (!user) {
                 setGoogleLoginError('User not found. Please register first.');
+            } else {
+                // Store token in localStorage and set it in auth headers
+                localStorage.setItem('token', token);
+                setAuthToken(token);
             }
         } catch (error) {
             if (error instanceof Error) {

@@ -21,6 +21,23 @@ const setAuthToken = (token: string | null) => {
     }
 };
 
+const checkToken = async () => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('Token not found');
+
+        const response = await axiosInstance.get(urls.checkToken.base, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Помилка перевірки токена: ', error);
+        throw error;
+    }
+};
+
 // Реєстрація
 const register = async (email: string, password: string, name: string): Promise<IRegisterResponse> => {
     try {
@@ -47,13 +64,16 @@ const confirmEmail = async (token: string) => {
 const login = async (email: string, password: string): Promise<ILoginResponse> => {
     try {
         const response = await axiosInstance.post(urls.login.base, { email, password });
-        setAuthToken(response.data.token); // Зберігаємо токен після успішного логіну
+        const token = response.data.token;
+        localStorage.setItem('token', token); // Збережіть токен
+        setAuthToken(token); // Встановіть токен у заголовки
         return response.data;
     } catch (error) {
         console.error('Помилка входу:', error);
         throw error;
     }
 };
+
 
 // Забули пароль
 const forgotPassword = async (email: string) => {
@@ -144,6 +164,7 @@ const authService = {
     resetPassword,
     registerWithGoogle,
     loginWithGoogle,
+    checkToken
 };
 
 export { authService, setAuthToken };

@@ -135,6 +135,21 @@ const registerWithGoogle = createAsyncThunk<
     }
 );
 
+const checkToken = createAsyncThunk<
+    boolean,
+    void,
+    { rejectValue: IErrorResponse }
+>(
+    'authSlice/checkToken',
+    async (_, { rejectWithValue }) => {
+        try {
+            return await authService.checkToken();
+        } catch (e) {
+            return rejectWithValue(handleAxiosError(e));
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -232,6 +247,18 @@ const authSlice = createSlice({
             .addCase(registerWithGoogle.rejected, (state, action) => {
                 state.error = action.payload || {message: 'Registration with Google failed'};
                 state.loading = false;
+            })
+            .addCase(checkToken.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(checkToken.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isLogin = action.payload;
+            })
+            .addCase(checkToken.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || { message: 'Token check failed' };
             });
     },
 });
@@ -245,6 +272,7 @@ const authActions = {
     resetPassword,
     loginWithGoogle,
     registerWithGoogle,
+    checkToken,
 };
 
 export {
