@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { baseURL, urls } from '../constants';
 import { ILoginResponse, IRegisterResponse, IUser } from "../interfaces";
-import { signInWithPopup } from "firebase/auth";
+import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, provider } from "../firebase/firebaseConfig";
 
 // Створення екземпляру axios
@@ -21,6 +21,7 @@ const setAuthToken = (token: string | null) => {
     }
 };
 
+// Перевірка токена
 const checkToken = async () => {
     try {
         const token = localStorage.getItem('token');
@@ -63,17 +64,17 @@ const confirmEmail = async (token: string) => {
 // Логін
 const login = async (email: string, password: string): Promise<ILoginResponse> => {
     try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const idToken = await userCredential.user.getIdToken(); // Отримання токена
+        localStorage.setItem('token', idToken); // Збереження токена
+        setAuthToken(idToken); // Встановлення токена у заголовки
         const response = await axiosInstance.post(urls.login.base, { email, password });
-        const token = response.data.token;
-        localStorage.setItem('token', token); // Збережіть токен
-        setAuthToken(token); // Встановіть токен у заголовки
         return response.data;
     } catch (error) {
         console.error('Помилка входу:', error);
         throw error;
     }
 };
-
 
 // Забули пароль
 const forgotPassword = async (email: string) => {
@@ -101,14 +102,10 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
+        const idToken = await user.getIdToken(); // Отримання токена
 
-        // Отримання токену доступу користувача
-        const idToken = await user.getIdToken();
-
-        // Відправка токену на бекенд для реєстрації користувача
         const response = await axiosInstance.post(urls.registerWithGoogle.base, { idToken });
 
-        // Перетворення відповіді бекенду у відповідність до інтерфейсу IUser
         const transformedUser: IUser = {
             uid: response.data.user.uid,
             name: response.data.user.name,
@@ -116,8 +113,7 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
             picture: response.data.user.picture,
         };
 
-        // Зберігаємо токен для подальших запитів
-        setAuthToken(response.data.token);
+        setAuthToken(response.data.token); // Збереження токена
 
         return { user: transformedUser, token: response.data.token };
     } catch (error) {
@@ -129,25 +125,19 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
 // Вхід через Google
 const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     try {
-        // Використання Firebase для аутентифікації користувача через Google
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
+        const idToken = await user.getIdToken(); // Отримання токена
 
-        // Отримання токену доступу від Firebase
-        const idToken = await user.getIdToken();
-
-        // Відправка idToken на бекенд для входу
         const response = await axiosInstance.post(urls.loginWithGoogle.base, { idToken });
 
-        // Перетворюємо відповідь бекенду у відповідність до інтерфейсу IUser
         const transformedUser: IUser = {
             uid: response.data.user.uid,
             name: response.data.user.displayName,
             email: response.data.user.email,
         };
 
-        // Зберігаємо токен для подальших запитів
-        setAuthToken(response.data.token);
+        setAuthToken(response.data.token); // Збереження токена
 
         return { user: transformedUser, token: response.data.token };
     } catch (error) {
