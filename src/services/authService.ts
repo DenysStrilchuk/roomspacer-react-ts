@@ -25,7 +25,10 @@ const setAuthToken = (token: string | null) => {
 const checkToken = async () => {
     try {
         const token = localStorage.getItem('token');
-        if (!token) throw new Error('Token not found');
+        if (!token) {
+            console.error('Token not found');
+            throw new Error('Token not found');
+        }
 
         const response = await axiosInstance.post(urls.checkToken.base, {}, {
             headers: {
@@ -65,10 +68,11 @@ const confirmEmail = async (token: string) => {
 const login = async (email: string, password: string): Promise<ILoginResponse> => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const idToken = await userCredential.user.getIdToken(); // Отримання токена
+        const idToken = await userCredential.user.getIdToken();
         localStorage.setItem('token', idToken); // Збереження токена
-        setAuthToken(idToken); // Встановлення токена у заголовки
+        console.log('Token from localStorage:', idToken);
         const response = await axiosInstance.post(urls.login.base, { email, password });
+        setAuthToken(response.data.token);
         return response.data;
     } catch (error) {
         console.error('Помилка входу:', error);
@@ -102,7 +106,9 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const idToken = await user.getIdToken(); // Отримання токена
+        const idToken = await user.getIdToken(); // Отримання ID токена
+
+        console.log('ID Token (Google Registration):', idToken); // Логування токена
 
         const response = await axiosInstance.post(urls.registerWithGoogle.base, { idToken });
 
@@ -127,7 +133,9 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const idToken = await user.getIdToken(); // Отримання токена
+        const idToken = await user.getIdToken(); // Отримання ID токена
+
+        console.log('ID Token (Google Login):', idToken); // Логування токена
 
         const response = await axiosInstance.post(urls.loginWithGoogle.base, { idToken });
 
