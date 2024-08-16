@@ -26,7 +26,7 @@ const checkToken = async () => {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('Token not found');
 
-        const response = await axiosInstance.get(urls.checkToken.base, {
+        const response = await axiosInstance.post(urls.checkToken.base, {}, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
