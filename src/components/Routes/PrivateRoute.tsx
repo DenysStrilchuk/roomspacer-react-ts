@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { RootState, authActions } from '../../store';
 import { useAppDispatch } from '../../hooks';
+import {authActions, RootState} from "../../store";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const dispatch = useAppDispatch();

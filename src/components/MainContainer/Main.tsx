@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import {authActions} from "../../store";
 import {useNavigate} from "react-router-dom";
+import {authActions} from "../../store";
 
 const Main = () => {
     const dispatch = useDispatch();

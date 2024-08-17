@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { authActions, RootState } from '../../../store';
 import { useAppDispatch } from '../../../hooks';
 import css from './Register.module.css';
 import { faEnvelope, faUser, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link, useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
+import {authActions, RootState} from "../../../store";
 
 interface IFormErrors {
     name?: string;

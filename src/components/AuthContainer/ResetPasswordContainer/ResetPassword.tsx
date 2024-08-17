@@ -4,8 +4,8 @@ import css from './ResetPassword.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useAppDispatch } from '../../../hooks';
-import { authActions } from '../../../store';
 import { ClipLoader } from 'react-spinners';
+import {authActions} from "../../../store";
 
 interface IFormErrors {
     password?: string;
