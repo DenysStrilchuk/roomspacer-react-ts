@@ -27,7 +27,7 @@ const checkToken = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
             console.error('Token not found');
-            throw new Error('Token not found');
+            new Error('Token not found');
         }
 
         const response = await axiosInstance.post(urls.checkToken.base, {}, {
@@ -76,7 +76,7 @@ const login = async (email: string, password: string): Promise<ILoginResponse> =
             console.log('Token from localStorage:', idToken);
         } else {
             console.error('Отриманий токен undefined або null');
-            throw new Error('Токен не отриманий');
+            new Error('Токен не отриманий');
         }
 
         const response = await axiosInstance.post(urls.login.base, { email, password, token: idToken });
