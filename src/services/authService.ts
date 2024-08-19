@@ -68,17 +68,33 @@ const confirmEmail = async (token: string) => {
 const login = async (email: string, password: string): Promise<ILoginResponse> => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const idToken = await userCredential.user.getIdToken();
-        localStorage.setItem('token', idToken); // Збереження токена
-        console.log('Token from localStorage:', idToken);
-        const response = await axiosInstance.post(urls.login.base, { email, password });
-        setAuthToken(response.data.token);
+        const idToken = await userCredential.user.getIdToken(); // Force refresh of token
+
+
+        if (idToken) {
+            localStorage.setItem('token', idToken); // Збереження токена з Firebase
+            console.log('Token from localStorage:', idToken);
+        } else {
+            console.error('Отриманий токен undefined або null');
+            throw new Error('Токен не отриманий');
+        }
+
+        const response = await axiosInstance.post(urls.login.base, { email, password, token: idToken });
+
+        if (response.data.token) {
+            setAuthToken(response.data.token);
+            console.log('Серверний токен:', response.data.token);
+        } else {
+            console.error('Серверний токен відсутній');
+        }
+
         return response.data;
     } catch (error) {
         console.error('Помилка входу:', error);
         throw error;
     }
 };
+
 
 // Забули пароль
 const forgotPassword = async (email: string) => {
