@@ -66,8 +66,7 @@ const login = async (email: string, password: string): Promise<ILoginResponse> =
         const idToken = await userCredential.user.getIdToken();
 
         if (idToken) {
-            localStorage.setItem('token', idToken); // Збереження токена з Firebase
-            console.log('Token from localStorage:', idToken);
+            localStorage.setItem('token', idToken);
         } else {
             console.error('The received token is undefined or null');
             new Error('Token not received');

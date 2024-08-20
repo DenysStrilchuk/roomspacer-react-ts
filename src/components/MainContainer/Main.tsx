@@ -8,9 +8,9 @@ const Main = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        localStorage.removeItem('token');
         dispatch(authActions.logout());
         navigate('/auth/login');
-        // Додатково, можна також здійснити редірект на сторінку входу або іншу
     };
 
     return (
