@@ -8,6 +8,7 @@ const resetPassword = '/auth/reset-password';
 const registerWithGoogle = '/auth/register-with-google';
 const loginWithGoogle = '/auth/login-with-google';
 const checkToken = '/auth/check-token';
+const checkUserExists = 'auth/check-user-exists'
 
 const urls = {
     login: {
@@ -33,6 +34,9 @@ const urls = {
     },
     checkToken: {
         base: checkToken
+    },
+    checkUserExists: {
+        base: checkUserExists
     }
 };
 

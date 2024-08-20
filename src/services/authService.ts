@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { baseURL, urls } from '../constants';
 import { ILoginResponse, IRegisterResponse, IUser } from "../interfaces";
-import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
+import {signInWithPopup, signInWithEmailAndPassword, getAuth, GoogleAuthProvider} from "firebase/auth";
 import { auth, provider } from "../firebase/firebaseConfig";
 
 
@@ -132,14 +132,37 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
     }
 };
 
+const checkIfUserExists = async (email: string): Promise<boolean> => {
+    try {
+        const response = await axiosInstance.get(`${urls.checkUserExists.base}?email=${email}`);
+        return response.data.exists;
+    } catch (error) {
+        console.error('Error checking if user exists:', error);
+        throw error;
+    }
+};
+
 const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
+        const email = user.email;
+
+        if (!email) {
+            return Promise.reject(new Error('Google account does not have an email address associated. Please use a different account.'));
+        }
+
+        const userExists = await checkIfUserExists(email);
+
+        if (!userExists) {
+            await user.delete();
+            return Promise.reject(new Error('User not registered. Please sign up first.'));
+        }
+
         const idToken = await user.getIdToken();
-
-        console.log('ID Token (Google Login):', idToken);
-
         const response = await axiosInstance.post(urls.loginWithGoogle.base, { idToken });
 
         const transformedUser: IUser = {
@@ -152,8 +175,8 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
 
         return { user: transformedUser, token: response.data.token };
     } catch (error) {
-        console.error('Google login error:', error);
-        throw error;
+        console.error('Google login error:', (error as Error).message || String(error));
+        return Promise.reject(error);
     }
 };
 
