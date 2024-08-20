@@ -4,7 +4,7 @@ import { ILoginResponse, IRegisterResponse, IUser } from "../interfaces";
 import { signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, provider } from "../firebase/firebaseConfig";
 
-// Створення екземпляру axios
+
 const axiosInstance = axios.create({
     baseURL,
     headers: {
@@ -12,7 +12,6 @@ const axiosInstance = axios.create({
     }
 });
 
-// Збереження токену для авторизації
 const setAuthToken = (token: string | null) => {
     if (token) {
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -21,7 +20,6 @@ const setAuthToken = (token: string | null) => {
     }
 };
 
-// Перевірка токена
 const checkToken = async () => {
     try {
         const token = localStorage.getItem('token');
@@ -37,94 +35,85 @@ const checkToken = async () => {
         });
         return response.data;
     } catch (error) {
-        console.error('Помилка перевірки токена: ', error);
+        console.error('Token validation error:', error);
         throw error;
     }
 };
 
-// Реєстрація
 const register = async (email: string, password: string, name: string): Promise<IRegisterResponse> => {
     try {
         const response = await axiosInstance.post(urls.register.base, { email, password, name });
         return response.data;
     } catch (error) {
-        console.error('Помилка реєстрації:', error);
+        console.error('Registration error:', error);
         throw error;
     }
 };
 
-// Підтвердження електронної пошти
 const confirmEmail = async (token: string) => {
     try {
         const response = await axiosInstance.get(`${urls.confirmEmail.base}/${token}`);
         return response.data;
     } catch (error) {
-        console.error('Помилка підтвердження електронної пошти:', error);
+        console.error('Email verification error:', error);
         throw error;
     }
 };
 
-// Логін
 const login = async (email: string, password: string): Promise<ILoginResponse> => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const idToken = await userCredential.user.getIdToken(); // Force refresh of token
-
+        const idToken = await userCredential.user.getIdToken();
 
         if (idToken) {
             localStorage.setItem('token', idToken); // Збереження токена з Firebase
             console.log('Token from localStorage:', idToken);
         } else {
-            console.error('Отриманий токен undefined або null');
-            new Error('Токен не отриманий');
+            console.error('The received token is undefined or null');
+            new Error('Token not received');
         }
 
         const response = await axiosInstance.post(urls.login.base, { email, password, token: idToken });
 
         if (response.data.token) {
             setAuthToken(response.data.token);
-            console.log('Серверний токен:', response.data.token);
         } else {
-            console.error('Серверний токен відсутній');
+            console.error('The server token is missing');
         }
 
         return response.data;
     } catch (error) {
-        console.error('Помилка входу:', error);
+        console.error('Login error:', error);
         throw error;
     }
 };
 
-
-// Забули пароль
 const forgotPassword = async (email: string) => {
     try {
         const response = await axiosInstance.post(urls.forgotPassword.base, { email });
         return response.data;
     } catch (error: any) {
-        console.error('Помилка відновлення паролю:', error.response?.data?.message || error.message);
+        console.error('Password recovery error:', error.response?.data?.message || error.message);
         throw new Error(error.response?.data?.message || error.message);
     }
 };
 
-// Скидання пароля
 const resetPassword = async (token: string, newPassword: string) => {
     try {
         await axiosInstance.post(urls.resetPassword.base, { token, newPassword });
     } catch (error) {
-        console.error('Помилка скидання паролю:', error);
+        console.error('Password reset error:', error);
         throw error;
     }
 };
 
-// Реєстрація через Google
 const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const idToken = await user.getIdToken(); // Отримання ID токена
+        const idToken = await user.getIdToken();
 
-        console.log('ID Token (Google Registration):', idToken); // Логування токена
+        console.log('ID Token (Google Registration):', idToken);
 
         const response = await axiosInstance.post(urls.registerWithGoogle.base, { idToken });
 
@@ -135,23 +124,22 @@ const registerWithGoogle = async (): Promise<{ user: IUser; token: string }> => 
             picture: response.data.user.picture,
         };
 
-        setAuthToken(response.data.token); // Збереження токена
+        setAuthToken(response.data.token);
 
         return { user: transformedUser, token: response.data.token };
     } catch (error) {
-        console.error('Помилка реєстрації через Google:', error);
+        console.error('Google registration error:', error);
         throw error;
     }
 };
 
-// Вхід через Google
 const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const idToken = await user.getIdToken(); // Отримання ID токена
+        const idToken = await user.getIdToken();
 
-        console.log('ID Token (Google Login):', idToken); // Логування токена
+        console.log('ID Token (Google Login):', idToken);
 
         const response = await axiosInstance.post(urls.loginWithGoogle.base, { idToken });
 
@@ -161,11 +149,11 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
             email: response.data.user.email,
         };
 
-        setAuthToken(response.data.token); // Збереження токена
+        setAuthToken(response.data.token);
 
         return { user: transformedUser, token: response.data.token };
     } catch (error) {
-        console.error('Помилка входу через Google:', error);
+        console.error('Google login error:', error);
         throw error;
     }
 };
