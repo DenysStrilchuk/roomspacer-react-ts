@@ -16,9 +16,8 @@ const Main = () => {
 
     return (
         <div>
-            <h2>Main Page</h2>
-            <button onClick={handleLogout}>Logout</button>
             <UsersList />
+            <button onClick={handleLogout}>Logout</button>
         </div>
     );
 };
