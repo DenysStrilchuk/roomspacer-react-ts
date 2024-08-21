@@ -1,6 +1,6 @@
 import {IUser} from "./userInterface";
 
-export interface ILoginResponse {
-    user: IUser;
+export interface IResponseUsers {
+    users: IUser[];
     token: string;
 }

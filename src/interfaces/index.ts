@@ -1,4 +1,4 @@
 export * from './errorResponseInterface';
-export * from './loginInterface';
-export * from './registerInterface';
+export * from './responseInterface';
+export * from './responseUsersInterface';
 export * from './userInterface';

@@ -1,0 +1,17 @@
+.usersContainer {
+    padding: 20px;
+}
+
+.usersContainer h2 {
+    margin-bottom: 20px;
+}
+
+.usersContainer ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.usersContainer li {
+    margin: 10px 0;
+    font-size: 16px;
+}

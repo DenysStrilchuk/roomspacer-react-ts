@@ -1,6 +1,6 @@
 import {IUser} from "./userInterface";
 
-export interface IRegisterResponse {
+export interface IResponse {
     user: IUser;
     token: string;
 }

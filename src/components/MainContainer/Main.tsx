@@ -1,7 +1,8 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import {useNavigate} from "react-router-dom";
-import {authActions} from "../../store";
+import { useNavigate } from 'react-router-dom';
+import { authActions } from '../../store';
+import {UsersList} from "../UsersContainer/UsersListContainer/UsersList";
 
 const Main = () => {
     const dispatch = useDispatch();
@@ -17,6 +18,7 @@ const Main = () => {
         <div>
             <h2>Main Page</h2>
             <button onClick={handleLogout}>Logout</button>
+            <UsersList />
         </div>
     );
 };

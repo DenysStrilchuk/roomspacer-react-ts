@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { baseURL, urls } from '../constants';
-import { ILoginResponse, IRegisterResponse, IUser } from "../interfaces";
+import {IResponse, IUser} from "../interfaces";
 import {signInWithPopup, signInWithEmailAndPassword, getAuth, GoogleAuthProvider} from "firebase/auth";
 import { auth, provider } from "../firebase/firebaseConfig";
 
@@ -40,7 +40,7 @@ const checkToken = async () => {
     }
 };
 
-const register = async (email: string, password: string, name: string): Promise<IRegisterResponse> => {
+const register = async (email: string, password: string, name: string): Promise<IResponse> => {
     try {
         const response = await axiosInstance.post(urls.register.base, { email, password, name });
         return response.data;
@@ -60,7 +60,7 @@ const confirmEmail = async (token: string) => {
     }
 };
 
-const login = async (email: string, password: string): Promise<ILoginResponse> => {
+const login = async (email: string, password: string): Promise<IResponse> => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const idToken = await userCredential.user.getIdToken();

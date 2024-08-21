@@ -8,7 +8,8 @@ const resetPassword = '/auth/reset-password';
 const registerWithGoogle = '/auth/register-with-google';
 const loginWithGoogle = '/auth/login-with-google';
 const checkToken = '/auth/check-token';
-const checkUserExists = 'auth/check-user-exists'
+const checkUserExists = 'auth/check-user-exists';
+const findAllUsers = 'users/find-all';
 
 const urls = {
     login: {
@@ -37,6 +38,9 @@ const urls = {
     },
     checkUserExists: {
         base: checkUserExists
+    },
+    findAllUsers: {
+        base: findAllUsers
     }
 };
 
