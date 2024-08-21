@@ -33,6 +33,7 @@ const Register: React.FC = () => {
     const [buttonError, setButtonError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false); // Loading state for "Create your free account"
     const [googleLoading, setGoogleLoading] = useState(false); // Loading state for "Sign up with Google"
+    const [isSubmitting, setIsSubmitting] = useState(false); // Стан для контролю активності кнопки
 
     const validateForm = () => {
         const newErrors: IFormErrors = {};
@@ -69,6 +70,7 @@ const Register: React.FC = () => {
         }
         setFormErrors({});
         setLoading(true); // Start loading spinner for "Create your free account"
+        setIsSubmitting(true);
         try {
             await dispatch(authActions.register({ email, password, name })).unwrap();
             setShowConfirmationMessage(true);
@@ -76,6 +78,7 @@ const Register: React.FC = () => {
             console.error('Error during registration:', err);
         } finally {
             setLoading(false); // Stop loading spinner for "Create your free account"
+            setIsSubmitting(false);
         }
     };
 
@@ -204,7 +207,10 @@ const Register: React.FC = () => {
                 {formErrors.confirmPassword && <p className={css.errorText}>{formErrors.confirmPassword}</p>}
                 {formErrors.global && <p className={css.errorText}>{formErrors.global}</p>}
 
-                <button type="submit" className={css.registerButton} onClick={handleButtonClick}>
+                <button type="submit"
+                        className={css.registerButton}
+                        onClick={handleButtonClick}
+                        disabled={isSubmitting} >
                     {loading ? (
                         <div className={css.loadingContainer}>
                             <span>Creating...</span>
