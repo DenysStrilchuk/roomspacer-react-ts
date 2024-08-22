@@ -6,12 +6,13 @@ import { RootState } from "../../../store";
 import { userActions } from "../../../store/slices/userSlice";
 import defaultAvatar from '../../../assets/defaultAvatar.png';
 import {UsersInfo} from "../UsersInfoContainer";
+import {IUser} from "../../../interfaces";
 
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { users, error } = useSelector((state: RootState) => state.user);
     const currentUser = useSelector((state: RootState) => state.auth.user);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
 
     useEffect(() => {
         dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
@@ -23,7 +24,7 @@ const UsersList: React.FC = () => {
 
     const filteredUsers = users.filter(user => user.uid !== currentUser?.uid);
 
-    const handleUserClick = (user: any) => {
+    const handleUserClick = (user: IUser) => {
         setSelectedUser(user);
     };
 

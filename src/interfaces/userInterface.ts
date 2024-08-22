@@ -3,6 +3,7 @@ export interface IUser {
     name: string;
     email: string;
     position?: string;
+    rooms?: string;
     picture?: string;
     createdAt?: Date;
     updatedAt?: Date;
