@@ -2,16 +2,33 @@
     padding: 20px;
 }
 
-.usersContainer h2 {
+.usersContainer h3 {
     margin-bottom: 20px;
 }
 
 .usersContainer ul {
     list-style-type: none;
     padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Відступи між аватарами */
 }
 
 .usersContainer li {
-    margin: 10px 0;
+    display: flex;
+    align-items: center;
     font-size: 16px;
+}
+
+.userItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
 }
