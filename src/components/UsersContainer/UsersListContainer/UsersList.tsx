@@ -8,6 +8,7 @@ import {userActions} from "../../../store/slices/userSlice";
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { users, error } = useSelector((state: RootState) => state.user);
+    const currentUser = useSelector((state: RootState) => state.auth.user);
 
     useEffect(() => {
         dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
@@ -17,11 +18,13 @@ const UsersList: React.FC = () => {
         return <p>Error: {error.message}</p>;
     }
 
+    const filteredUsers = users.filter(user => user.uid !== currentUser?.uid);
+
     return (
         <div className={css.usersContainer}>
             <h2>People</h2>
             <ul>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                     <li key={user.uid}>{user.name} ({user.email})</li>
                 ))}
             </ul>

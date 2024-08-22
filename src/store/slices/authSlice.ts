@@ -33,10 +33,15 @@ const login = createAsyncThunk<
     { rejectValue: IErrorResponse }
 >(
     'authSlice/login',
-    async ({email, password}, {rejectWithValue}) => {
+    async ({ email, password }, { rejectWithValue }) => {
         try {
             const data = await authService.login(email, password);
-            return {user: data.user, token: data.token};
+
+            // Збереження користувача та токена в localStorage
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+
+            return { user: data.user, token: data.token };
         } catch (e) {
             return rejectWithValue(handleAxiosError(e));
         }
@@ -162,6 +167,9 @@ const authSlice = createSlice({
         setToken: (state, action) => {
             state.token = action.payload;
         },
+        setUser: (state, action) => {
+            state.user = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -173,6 +181,8 @@ const authSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 state.user = action.payload.user;
                 state.token = action.payload.token;
+                localStorage.setItem('user', JSON.stringify(action.payload.user));  // Збереження користувача в локальне сховище
+                localStorage.setItem('token', action.payload.token);  // Збереження токена в локальне сховище
                 state.loading = false;
                 state.isLogin = true;
             })
@@ -226,6 +236,7 @@ const authSlice = createSlice({
             .addCase(loginWithGoogle.fulfilled, (state, action) => {
                 state.user = action.payload.user;
                 state.token = action.payload.token;
+                localStorage.setItem('user', JSON.stringify(action.payload.user));  // Збереження користувача в локальне сховище
                 state.loading = false;
                 state.isLogin = true;
             })
