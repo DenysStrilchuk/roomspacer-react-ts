@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB8nNIWLBO6CrL1RFJjvErSuhn1SCTms-8",
-    authDomain: "roomspacer-cbdad.firebaseapp.com",
-    projectId: "roomspacer-cbdad",
-    storageBucket: "roomspacer-cbdad.appspot.com",
-    messagingSenderId: "624878552223",
-    appId: "1:624878552223:web:a88f76a76824575c398eaa",
-    measurementId: "G-7Z33FN0JP3"
+    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.REACT_APP_FIREBASE_APP_ID,
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
 };
 
 // Ініціалізація Firebase
