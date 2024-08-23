@@ -20,7 +20,6 @@ const Main = () => {
 
     const handleLogout = async () => {
         try {
-
             localStorage.removeItem('token');
             localStorage.removeItem('user');  // Видалення користувача з локального сховища
             dispatch(authActions.logout());

@@ -89,13 +89,7 @@ const login = async (email: string, password: string): Promise<IResponse> => {
 
 const logout = async () => {
     try {
-        const auth = getAuth();
-        await auth.signOut(); // Вихід із Firebase Auth
 
-        localStorage.removeItem('token');  // Видалення токена з локального сховища
-        localStorage.removeItem('user');   // Видалення інформації про користувача з локального сховища
-
-        setAuthToken(null); // Очищення заголовків авторизації в Axios
     } catch (error) {
         console.error('Logout error:', error);
         throw error;
