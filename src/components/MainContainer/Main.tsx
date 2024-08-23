@@ -20,8 +20,6 @@ const Main = () => {
 
     const handleLogout = async () => {
         try {
-            // Оновіть статус користувача до offline в базі даних
-            await dispatch(authActions.updateUserStatusOffline());
 
             localStorage.removeItem('token');
             localStorage.removeItem('user');  // Видалення користувача з локального сховища

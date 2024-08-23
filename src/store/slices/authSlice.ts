@@ -155,21 +155,6 @@ const checkToken = createAsyncThunk<
     }
 );
 
-const updateUserStatusOffline = createAsyncThunk<
-    void,
-    void,
-    { rejectValue: IErrorResponse }
->(
-    'authSlice/updateUserStatusOffline',
-    async (_, { rejectWithValue }) => {
-        try {
-            await authService.updateUserStatus('offline');
-        } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
-        }
-    }
-);
-
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -288,17 +273,6 @@ const authSlice = createSlice({
             .addCase(checkToken.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || { message: 'Token check failed' };
-            })
-            .addCase(updateUserStatusOffline.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(updateUserStatusOffline.fulfilled, (state) => {
-                state.loading = false;
-            })
-            .addCase(updateUserStatusOffline.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload || {message: 'Failed to update user status'};
             });
     },
 });
@@ -313,7 +287,6 @@ const authActions = {
     loginWithGoogle,
     registerWithGoogle,
     checkToken,
-    updateUserStatusOffline,
 };
 
 export {

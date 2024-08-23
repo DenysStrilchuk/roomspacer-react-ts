@@ -195,26 +195,6 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     }
 };
 
-const updateUserStatus = async (status: string) => {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('Token not found');
-        }
-
-        const response = await axiosInstance.patch(urls.updateUserStatus.base, { status }, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Error updating user status:', error);
-        throw error;
-    }
-};
-
-
 const authService = {
     register,
     confirmEmail,
@@ -225,7 +205,6 @@ const authService = {
     registerWithGoogle,
     loginWithGoogle,
     checkToken,
-    updateUserStatus,
 };
 
 export { authService, setAuthToken };
