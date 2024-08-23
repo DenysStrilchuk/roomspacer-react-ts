@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { authActions } from '../../store';
-import {UsersList} from "../UsersContainer/UsersListContainer/UsersList";
+import { UsersList } from "../UsersContainer";
+import {useAppDispatch} from "../../hooks";
 
 const Main = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,11 +18,19 @@ const Main = () => {
         }
     }, [dispatch]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');  // Видалення користувача з локального сховища
-        dispatch(authActions.logout());
-        navigate('/auth/login');
+    const handleLogout = async () => {
+        try {
+            // Оновіть статус користувача до offline в базі даних
+            await dispatch(authActions.updateUserStatusOffline());
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');  // Видалення користувача з локального сховища
+            dispatch(authActions.logout());
+            navigate('/auth/login');
+        } catch (error) {
+            console.error('Помилка під час логауту:', error);
+            // Можливо, виведіть повідомлення користувачу або виконайте інші дії
+        }
     };
 
     return (

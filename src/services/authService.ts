@@ -87,6 +87,21 @@ const login = async (email: string, password: string): Promise<IResponse> => {
     }
 };
 
+const logout = async () => {
+    try {
+        const auth = getAuth();
+        await auth.signOut(); // Вихід із Firebase Auth
+
+        localStorage.removeItem('token');  // Видалення токена з локального сховища
+        localStorage.removeItem('user');   // Видалення інформації про користувача з локального сховища
+
+        setAuthToken(null); // Очищення заголовків авторизації в Axios
+    } catch (error) {
+        console.error('Logout error:', error);
+        throw error;
+    }
+};
+
 const forgotPassword = async (email: string) => {
     try {
         const response = await axiosInstance.post(urls.forgotPassword.base, { email });
@@ -180,15 +195,37 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
     }
 };
 
+const updateUserStatus = async (status: string) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('Token not found');
+        }
+
+        const response = await axiosInstance.patch(urls.updateUserStatus.base, { status }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user status:', error);
+        throw error;
+    }
+};
+
+
 const authService = {
     register,
     confirmEmail,
     login,
+    logout,
     forgotPassword,
     resetPassword,
     registerWithGoogle,
     loginWithGoogle,
-    checkToken
+    checkToken,
+    updateUserStatus,
 };
 
 export { authService, setAuthToken };

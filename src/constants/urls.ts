@@ -9,6 +9,7 @@ const registerWithGoogle = '/auth/register-with-google';
 const loginWithGoogle = '/auth/login-with-google';
 const checkToken = '/auth/check-token';
 const checkUserExists = 'auth/check-user-exists';
+const updateUserStatus = 'auth/online-users';
 const findAllUsers = 'users/find-all';
 
 const urls = {
@@ -38,6 +39,9 @@ const urls = {
     },
     checkUserExists: {
         base: checkUserExists
+    },
+    updateUserStatus : {
+        base: updateUserStatus
     },
     findAllUsers: {
         base: findAllUsers
