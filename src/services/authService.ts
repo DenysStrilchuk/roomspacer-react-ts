@@ -87,9 +87,24 @@ const login = async (email: string, password: string): Promise<IResponse> => {
     }
 };
 
-const logout = async () => {
+const logout = async (): Promise<void> => {
     try {
+        const uid = localStorage.getItem('userUid'); // Отримуємо UID користувача з localStorage
 
+        if (!uid) {
+            throw new Error('User UID not found in localStorage');
+        }
+
+        const response = await axiosInstance.post(urls.logout.base, { uid });
+
+        if (response.status === 200) {
+            console.log('User logged out successfully');
+            localStorage.removeItem('token'); // Видаляємо токен з localStorage
+            localStorage.removeItem('userUid'); // Видаляємо UID з localStorage
+            setAuthToken(null); // Очищаємо заголовок авторизації
+        } else {
+            throw new Error('Failed to logout');
+        }
     } catch (error) {
         console.error('Logout error:', error);
         throw error;

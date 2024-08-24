@@ -1,6 +1,7 @@
 const baseURL = 'http://localhost:3001';
 
 const login = '/auth/login';
+const logout = '/auth/logout';
 const register = '/auth/register';
 const confirmEmail = '/auth/confirm';
 const forgotPassword = '/auth/forgot-password';
@@ -15,6 +16,9 @@ const findAllUsers = 'users/find-all';
 const urls = {
     login: {
         base: login
+    },
+    logout: {
+        base: logout
     },
     register: {
         base: register
