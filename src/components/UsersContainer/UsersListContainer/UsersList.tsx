@@ -5,17 +5,26 @@ import { useAppDispatch } from "../../../hooks";
 import { RootState } from "../../../store";
 import { userActions } from "../../../store/slices/userSlice";
 import defaultAvatar from '../../../assets/defaultAvatar.png';
-import {UsersInfo} from "../UsersInfoContainer";
-import {IUser} from "../../../interfaces";
+import { IUser } from "../../../interfaces";
+import { userService } from "../../../services";
 
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
     const { users, error } = useSelector((state: RootState) => state.user);
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
+    const [usersStatus, setUsersStatus] = useState<Array<{ uid: string; email: string; online: boolean; lastOnline: Date | null }>>([]);
 
     useEffect(() => {
         dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
+
+        const fetchUsersStatus = () => {
+            userService.getUsersStatus()
+                .then(status => setUsersStatus(status))
+                .catch(error => console.error('Error fetching users status:', error));
+        };
+
+        fetchUsersStatus();
     }, [dispatch]);
 
     if (error) {
@@ -32,6 +41,11 @@ const UsersList: React.FC = () => {
         setSelectedUser(null);
     };
 
+    const getStatusDot = (uid: string) => {
+        const userStatus = usersStatus.find(status => status.uid === uid);
+        return userStatus?.online ? <span className={css.onlineDot}></span> : null;
+    };
+
     return (
         <div className={css.usersContainer}>
             <h3>People</h3>
@@ -39,18 +53,34 @@ const UsersList: React.FC = () => {
                 {filteredUsers.map((user) => (
                     <li key={user.uid} onClick={() => handleUserClick(user)}>
                         <div className={css.userItem}>
-                            <img
-                                src={user.picture || defaultAvatar}
-                                alt="User Avatar"
-                                className={css.avatar}
-                            />
+                            <div className={css.avatarContainer}>
+                                <img
+                                    src={user.picture || defaultAvatar}
+                                    alt="User Avatar"
+                                    className={css.avatar}
+                                />
+                                {getStatusDot(user.uid)}
+                            </div>
                         </div>
                     </li>
                 ))}
             </ul>
-            <UsersInfo user={selectedUser} onClose={handleClose} />
+            {selectedUser && (
+                <div className={css.userDetails}>
+                    <button className={css.closeButton} onClick={handleClose}>×</button>
+                    <img
+                        src={selectedUser.picture || defaultAvatar}
+                        alt="User Avatar"
+                        className={css.userDetailsAvatar}
+                    />
+                    <h2>{selectedUser.name}</h2>
+                    <p className={css.userDetailsLabel}>E-mail:</p>
+                    <p className={css.userDetailsEmail}>{selectedUser.email}</p>
+                </div>
+
+            )}
         </div>
     );
 };
 
-export { UsersList };
+export {UsersList};

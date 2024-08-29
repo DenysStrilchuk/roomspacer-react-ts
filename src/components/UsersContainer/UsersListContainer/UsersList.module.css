@@ -1,5 +1,11 @@
 .usersContainer {
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.userList {
+    flex: 1;
 }
 
 .usersContainer h3 {
@@ -23,12 +29,80 @@
 .userItem {
     display: flex;
     align-items: center;
-    gap: 10px;
+    margin-bottom: 10px;
+    position: relative;
     cursor: pointer;
 }
 
+.avatarContainer {
+    position: relative;
+}
+
 .avatar {
-    width: 64px;
-    height: 64px;
+    width: 70px;
+    height: 65px;
     border-radius: 50%;
 }
+
+.onlineDot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: rgb(70,77,97);
+    border-radius: 50%;
+    top: 4px;
+    right: 2px;
+    border: 2px solid white; /* Щоб крапочка виглядала акуратно */
+}
+
+.userDetails {
+    width: 25%;
+    height: 100vh;
+    position: fixed;
+    right: 0;
+    top: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.userDetailsAvatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.closeButton {
+    align-self: flex-start;
+    font-size: 40px; /* Slightly larger */
+    font-weight: 100; /* Thinner */
+    color: rgb(76,82,102);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.userDetailsLabel {
+    align-self: flex-start;
+    font-size: 14px;
+    font-weight: lighter;
+    color: rgb(179,181,185);
+    margin-bottom: 5px;
+}
+
+.userDetailsEmail {
+    align-self: flex-start;
+    font-size: 18px;
+    font-weight: lighter;
+    margin-bottom: 20px;
+}
+
+

@@ -12,6 +12,7 @@ const checkToken = '/auth/check-token';
 const checkUserExists = 'auth/check-user-exists';
 const updateUserStatus = 'auth/online-users';
 const findAllUsers = 'users/find-all';
+const usersStatus = 'users/users-status';
 
 const urls = {
     login: {
@@ -49,6 +50,9 @@ const urls = {
     },
     findAllUsers: {
         base: findAllUsers
+    },
+    usersStatus: {
+        base: usersStatus
     }
 };
 
