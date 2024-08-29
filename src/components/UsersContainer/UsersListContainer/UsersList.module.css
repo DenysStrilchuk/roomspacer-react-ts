@@ -1,6 +1,7 @@
 .usersContainer {
     display: flex;
     flex-direction: column;
+    font-family: 'Arial', sans-serif;
     position: relative;
 }
 
@@ -17,7 +18,7 @@
     padding: 0;
     display: flex;
     align-items: center;
-    gap: 20px; /* Відступи між аватарами */
+    gap: 20px;
 }
 
 .usersContainer li {
@@ -90,7 +91,7 @@
     cursor: pointer;
 }
 
-.userDetailsLabel {
+.label {
     align-self: flex-start;
     font-size: 14px;
     font-weight: lighter;
@@ -98,7 +99,7 @@
     margin-bottom: 5px;
 }
 
-.userDetailsEmail {
+.userEmail {
     align-self: flex-start;
     font-size: 18px;
     font-weight: lighter;

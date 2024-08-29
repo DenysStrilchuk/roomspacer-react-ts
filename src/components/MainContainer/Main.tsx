@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { authActions } from '../../store';
 import { UsersList } from "../UsersContainer";
 import { useAppDispatch } from "../../hooks";
+import css from './Main.module.css';
+
 
 const Main = () => {
     const dispatch = useAppDispatch();
@@ -22,7 +24,7 @@ const Main = () => {
 
 
     return (
-        <div>
+        <div className={css.mainContainer}>
             <UsersList />
             <button onClick={handleLogout}>Logout</button>
         </div>

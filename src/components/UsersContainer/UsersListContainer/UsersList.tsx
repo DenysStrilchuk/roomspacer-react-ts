@@ -74,13 +74,13 @@ const UsersList: React.FC = () => {
                         className={css.userDetailsAvatar}
                     />
                     <h2>{selectedUser.name}</h2>
-                    <p className={css.userDetailsLabel}>E-mail:</p>
-                    <p className={css.userDetailsEmail}>{selectedUser.email}</p>
+                    <p className={css.label}>E-mail:</p>
+                    <p className={css.userEmail}>{selectedUser.email}</p>
+                    <p className={css.label}>Rooms:</p>
                 </div>
-
             )}
         </div>
     );
 };
 
-export {UsersList};
+export { UsersList };
