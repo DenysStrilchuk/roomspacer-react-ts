@@ -2,6 +2,7 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import {AxiosError} from 'axios';
 import {authService, setAuthToken} from '../../services';
 import {IErrorResponse, IUser} from '../../interfaces';
+import { AppDispatch } from '../store';
 
 interface IAuthState {
     user: IUser | null;
@@ -21,9 +22,27 @@ const initialState: IAuthState = {
     isLogin: false,
 };
 
-const handleAxiosError = (e: unknown): IErrorResponse => {
-    const error = e as AxiosError<IErrorResponse>;
-    return error.response?.data || {message: 'An error occurred'};
+const handleAxiosError = async (e: unknown): Promise<IErrorResponse> => {
+    console.error('Axios error:', e);
+
+    await new Promise(resolve => setTimeout(resolve, 1000)); // затримка 1 секунда
+
+    if (e instanceof AxiosError && e.response) {
+        return e.response.data;
+    }
+
+    return { message: 'An error occurred' };
+};
+
+
+const logoutAndRedirect = () => async (dispatch: AppDispatch) => {
+    try {
+        await authService.logout(); // Виклик логауту на бекенді
+        dispatch(authActions.logout()); // Виклик екшену для логауту
+        window.location.href = '/auth/login'; // Перенаправлення на сторінку логінації
+    } catch (error) {
+        console.error('Logout and redirect error:', error);
+    }
 };
 
 // Async thunks for email/password authentication
@@ -43,7 +62,7 @@ const login = createAsyncThunk<
 
             return { user: data.user, token: data.token };
         } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+            return rejectWithValue(await handleAxiosError(e));
         }
     }
 );
@@ -59,7 +78,7 @@ const register = createAsyncThunk<
             const data = await authService.register(email, password, name);
             return {user: data.user, token: data.token};
         } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+            return rejectWithValue(await handleAxiosError(e));
         }
     }
 );
@@ -90,7 +109,7 @@ const resetPassword = createAsyncThunk<
         try {
             await authService.resetPassword(token, newPassword);
         } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+            return rejectWithValue(await handleAxiosError(e));
         }
     }
 );
@@ -113,7 +132,7 @@ const loginWithGoogle = createAsyncThunk<
             };
             return {user: transformedUser, token: data.token};
         } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+            return rejectWithValue(await handleAxiosError(e));
         }
     }
 );
@@ -135,7 +154,7 @@ const registerWithGoogle = createAsyncThunk<
             };
             return {user: transformedUser, token: data.token};
         } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+            return rejectWithValue(await handleAxiosError(e));
         }
     }
 );
@@ -150,7 +169,7 @@ const checkToken = createAsyncThunk<
         try {
             return await authService.checkToken();
         } catch (e) {
-            return rejectWithValue(handleAxiosError(e));
+            return rejectWithValue(await handleAxiosError(e));
         }
     }
 );
@@ -287,6 +306,7 @@ const authActions = {
     loginWithGoogle,
     registerWithGoogle,
     checkToken,
+    logoutAndRedirect,
 };
 
 export {

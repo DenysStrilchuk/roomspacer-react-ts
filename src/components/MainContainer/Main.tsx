@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { authActions } from '../../store';
 import { UsersList } from "../UsersContainer";
-import {useAppDispatch} from "../../hooks";
+import { useAppDispatch } from "../../hooks";
 
 const Main = () => {
     const dispatch = useAppDispatch();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -18,17 +16,10 @@ const Main = () => {
         }
     }, [dispatch]);
 
-    const handleLogout = async () => {
-        try {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');  // Видалення користувача з локального сховища
-            dispatch(authActions.logout());
-            navigate('/auth/login');
-        } catch (error) {
-            console.error('Помилка під час логауту:', error);
-            // Можливо, виведіть повідомлення користувачу або виконайте інші дії
-        }
+    const handleLogout = () => {
+        dispatch(authActions.logoutAndRedirect()); // Виклик екшену для логауту та перенаправлення
     };
+
 
     return (
         <div>

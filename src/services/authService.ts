@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { baseURL, urls } from '../constants';
 import {IResponse, IUser} from "../interfaces";
-import {signInWithPopup, signInWithEmailAndPassword, getAuth, GoogleAuthProvider} from "firebase/auth";
+import {signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, provider } from "../firebase/firebaseConfig";
 
 
@@ -25,7 +25,7 @@ const checkToken = async () => {
         const token = localStorage.getItem('token');
         if (!token) {
             console.error('Token not found');
-            new Error('Token not found');
+            throw new Error('Token not found');
         }
 
         const response = await axiosInstance.post(urls.checkToken.base, {}, {
@@ -33,12 +33,24 @@ const checkToken = async () => {
                 Authorization: `Bearer ${token}`,
             },
         });
+
+        console.log('Token is valid:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Token validation error:', error);
-        throw error;
+        const err = error as any; // Приведення до типу `any`
+
+        if (err.response && err.response.status === 401) {
+            console.error('Token is invalid or expired, logging out...');
+            localStorage.removeItem('token');
+        } else {
+            console.error('An error occurred:', err.message);
+        }
+
+        throw err; // Кидаємо помилку далі
     }
 };
+
+
 
 const register = async (email: string, password: string, name: string): Promise<IResponse> => {
     try {
@@ -67,6 +79,7 @@ const login = async (email: string, password: string): Promise<IResponse> => {
 
         if (idToken) {
             localStorage.setItem('token', idToken);
+            localStorage.setItem('userUid', userCredential.user.uid); // Додаємо uid у локальне сховище
         } else {
             console.error('The received token is undefined or null');
             new Error('Token not received');
@@ -87,22 +100,34 @@ const login = async (email: string, password: string): Promise<IResponse> => {
     }
 };
 
+
 const logout = async (): Promise<void> => {
     try {
-        const uid = localStorage.getItem('userUid'); // Отримуємо UID користувача з localStorage
+        const token = localStorage.getItem('token');
+        const uid = localStorage.getItem('userUid');
 
-        if (!uid) {
-            throw new Error('User UID not found in localStorage');
+        if (!token && !uid) {
+            console.error('Token and User UID not found in localStorage');
+            return;
+        } else if (!token) {
+            console.error('Token not found in localStorage');
+            return;
+        } else if (!uid) {
+            console.error('User UID not found in localStorage');
+            return;
         }
+
+        console.log(`Logout initiated. Token: ${token}, UID: ${uid}`);
 
         const response = await axiosInstance.post(urls.logout.base, { uid });
 
-        if (response.status === 200) {
-            console.log('User logged out successfully');
-            localStorage.removeItem('token'); // Видаляємо токен з localStorage
-            localStorage.removeItem('userUid'); // Видаляємо UID з localStorage
-            setAuthToken(null); // Очищаємо заголовок авторизації
+        if (response.status === 201) {
+            console.log(`User with uid ${uid} logged out successfully`);
+            localStorage.removeItem('token');
+            localStorage.removeItem('userUid');
+            setAuthToken(null);
         } else {
+            console.error('Failed to logout. Server response:', response);
             throw new Error('Failed to logout');
         }
     } catch (error) {
@@ -110,6 +135,8 @@ const logout = async (): Promise<void> => {
         throw error;
     }
 };
+
+
 
 const forgotPassword = async (email: string) => {
     try {
@@ -167,9 +194,6 @@ const checkIfUserExists = async (email: string): Promise<boolean> => {
 };
 
 const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
-    const auth = getAuth();
-    const provider = new GoogleAuthProvider();
-
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
@@ -195,6 +219,7 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
             email: response.data.user.email,
         };
 
+        localStorage.setItem('userUid', transformedUser.uid); // Додаємо uid у локальне сховище
         setAuthToken(response.data.token);
 
         return { user: transformedUser, token: response.data.token };
@@ -203,6 +228,7 @@ const loginWithGoogle = async (): Promise<{ user: IUser; token: string }> => {
         return Promise.reject(error);
     }
 };
+
 
 const authService = {
     register,
