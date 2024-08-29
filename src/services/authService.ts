@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import { baseURL, urls } from '../constants';
 import {IResponse, IUser} from "../interfaces";
 import {signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
@@ -24,7 +24,6 @@ const checkToken = async () => {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.error('Token not found');
             throw new Error('Token not found');
         }
 
@@ -37,20 +36,22 @@ const checkToken = async () => {
         console.log('Token is valid:', response.data);
         return response.data;
     } catch (error) {
-        const err = error as any; // Приведення до типу `any`
-
-        if (err.response && err.response.status === 401) {
-            console.error('Token is invalid or expired, logging out...');
-            localStorage.removeItem('token');
+        if (error instanceof AxiosError) {
+            if (error.response && error.response.status === 401) {
+                console.error('Token is invalid or expired, logging out...');
+                localStorage.removeItem('token');
+                throw new Error('Unauthorized: Token is invalid or expired');
+            } else {
+                console.error('An error occurred:', error.message);
+                throw new Error('An unexpected error occurred');
+            }
         } else {
-            console.error('An error occurred:', err.message);
+            // Якщо помилка не від Axios
+            console.error('An unexpected error occurred:', (error as Error).message);
+            throw new Error('An unexpected error occurred');
         }
-
-        throw err; // Кидаємо помилку далі
     }
 };
-
-
 
 const register = async (email: string, password: string, name: string): Promise<IResponse> => {
     try {
