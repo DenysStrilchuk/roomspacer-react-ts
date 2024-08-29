@@ -13,20 +13,20 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-    (response) => {
-        // Якщо відповідь успішна, просто повертаємо її
-        return response;
-    },
+    (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                const newToken = await refreshToken();
-                axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-                originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-                return axiosInstance(originalRequest);
+                // Оновлюємо токен через Firebase
+                const newToken = await auth.currentUser?.getIdToken(true);
+                if (newToken) {
+                    setAuthToken(newToken);
+                    originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                    return axiosInstance(originalRequest);
+                }
             } catch (refreshError) {
                 console.error('Refresh token failed:', refreshError);
                 return Promise.reject(refreshError);
@@ -36,6 +36,7 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
 
 const setAuthToken = (token: string | null) => {
     if (token) {
@@ -80,26 +81,18 @@ const checkToken = async () => {
 
 const refreshToken = async (): Promise<string> => {
     try {
-        const storedRefreshToken = localStorage.getItem('refreshToken');
-        if (!storedRefreshToken) {
-            throw new Error('Refresh token not found');
+        const newIdToken = await auth.currentUser?.getIdToken(true);
+        if (newIdToken) {
+            setAuthToken(newIdToken);
+            localStorage.setItem('token', newIdToken);
+            return newIdToken;
         }
-
-        const response = await axiosInstance.post(urls.refreshToken.base, {refreshToken: storedRefreshToken});
-
-        if (response.data.token) {
-            setAuthToken(response.data.token);
-            localStorage.setItem('token', response.data.token);
-            return response.data.token;
-        } else {
-            throw new Error('Failed to refresh token');
-        }
+        throw new Error('Failed to refresh token');
     } catch (error) {
         console.error('Error refreshing token:', error);
         throw error;
     }
 };
-
 
 const register = async (email: string, password: string, name: string): Promise<IResponse> => {
     try {
@@ -130,13 +123,13 @@ const login = async (email: string, password: string): Promise<IResponse> => {
             localStorage.setItem('token', idToken);
             localStorage.setItem('userUid', userCredential.user.uid);
             const refreshToken = userCredential.user.refreshToken;
-            localStorage.setItem('refreshToken', refreshToken); // Збереження refresh токену
+            localStorage.setItem('refreshToken', refreshToken);
         } else {
             console.error('The received token is undefined or null');
             throw new Error('Token not received');
         }
 
-        const response = await axiosInstance.post(urls.login.base, {email, password, token: idToken});
+        const response = await axiosInstance.post(urls.login.base, { email, password, token: idToken });
 
         if (response.data.token) {
             setAuthToken(response.data.token);
@@ -293,6 +286,7 @@ const authService = {
     registerWithGoogle,
     loginWithGoogle,
     checkToken,
+    refreshToken,
 };
 
 export {authService, setAuthToken};
