@@ -7,6 +7,8 @@ import { userActions } from "../../../store/slices/userSlice";
 import defaultAvatar from '../../../assets/defaultAvatar.png';
 import { IUser } from "../../../interfaces";
 import { userService } from "../../../services";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -15,6 +17,7 @@ const UsersList: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
     const [usersStatus, setUsersStatus] = useState<Array<{ uid: string; email: string; online: boolean; lastOnline: Date | null }>>([]);
     const [isWindowVisible, setIsWindowVisible] = useState(false);
+    const [email, setEmail] = useState<string>('');
 
     useEffect(() => {
         dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
@@ -55,12 +58,52 @@ const UsersList: React.FC = () => {
         setIsWindowVisible(false);
     };
 
+    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEmail(event.target.value);
+    };
+
+    const handleAddEmailClick = () => {
+        if (email.trim() === '') {
+            alert('Please enter a valid email address.');
+            return;
+        }
+
+        userService.inviteUserByEmail(email)
+            .then(() => {
+                alert('Invitation sent successfully!');
+                setEmail('');
+                setIsWindowVisible(false);
+            })
+            .catch(error => {
+                console.error('Error sending invitation:', error);
+                alert('Failed to send invitation. Please try again.');
+            });
+    };
+
     return (
         <div className={css.usersContainer}>
             <div className={css.headerContainer}>
                 <h3>People</h3>
                 <button className={css.addButton} onClick={handleAddClick}>+</button>
             </div>
+            {isWindowVisible && (
+                <div className={css.modalWindow}>
+                    <div className={css.closeModalButton} onClick={handleCloseModal}>×</div>
+                    <p className={css.inviteText}>Invite people to collaborate</p>
+                    <div className={css.inputContainer}>
+                        <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
+                        <input
+                            type="email"
+                            placeholder="e.g. name@mail.com"
+                            required
+                            value={email}
+                            onChange={handleEmailChange}
+                            className={css.mailInput}
+                        />
+                        <button className={css.addButtonInsideInput} onClick={handleAddEmailClick}>Add</button>
+                    </div>
+                </div>
+            )}
             <ul className={css.userList}>
                 {filteredUsers.map((user) => (
                     <li key={user.uid} onClick={() => handleUserClick(user)}>
@@ -96,4 +139,4 @@ const UsersList: React.FC = () => {
     );
 };
 
-export {UsersList};
+export { UsersList };

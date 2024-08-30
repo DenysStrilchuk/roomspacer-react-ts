@@ -44,9 +44,27 @@ const getUsersStatus = async (): Promise<Array<{ uid: string; email: string; onl
     }
 };
 
+
+const inviteUserByEmail = async (email: string): Promise<void> => {
+    try {
+        const token = localStorage.getItem('token');
+        const url = urls.inviteUserByEmail.base; // Переконайтеся, що URL правильний
+        await axiosInstance.post(url, { email }, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+        console.log(`Invitation sent to ${email}`);
+    } catch (error) {
+        console.error('Error inviting user by email:', error);
+        throw error;
+    }
+};
+
 const userService = {
     findAllUsers,
-    getUsersStatus
+    getUsersStatus,
+    inviteUserByEmail,
 }
 
 export {
