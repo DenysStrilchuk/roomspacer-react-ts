@@ -14,6 +14,7 @@ const UsersList: React.FC = () => {
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
     const [usersStatus, setUsersStatus] = useState<Array<{ uid: string; email: string; online: boolean; lastOnline: Date | null }>>([]);
+    const [isWindowVisible, setIsWindowVisible] = useState(false);
 
     useEffect(() => {
         dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
@@ -46,9 +47,20 @@ const UsersList: React.FC = () => {
         return userStatus?.online ? <span className={css.onlineDot}></span> : null;
     };
 
+    const handleAddClick = () => {
+        setIsWindowVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsWindowVisible(false);
+    };
+
     return (
         <div className={css.usersContainer}>
-            <h3>People</h3>
+            <div className={css.headerContainer}>
+                <h3>People</h3>
+                <button className={css.addButton} onClick={handleAddClick}>+</button>
+            </div>
             <ul className={css.userList}>
                 {filteredUsers.map((user) => (
                     <li key={user.uid} onClick={() => handleUserClick(user)}>
@@ -84,4 +96,4 @@ const UsersList: React.FC = () => {
     );
 };
 
-export { UsersList };
+export {UsersList};
