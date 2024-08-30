@@ -60,6 +60,7 @@ const UsersList: React.FC = () => {
                                     className={css.avatar}
                                 />
                                 {getStatusDot(user.uid)}
+                                <p>{user.name}</p>
                             </div>
                         </div>
                     </li>
