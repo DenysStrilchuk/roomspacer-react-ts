@@ -322,7 +322,7 @@
     right: 0;
     bottom: 0;
     background-color: rgb(240, 240, 242);
-    transition: .4s;
+    transition: .3s;
     border-radius: 34px;
 }
 
@@ -344,6 +344,7 @@ input:checked + .slider {
 
 input:checked + .slider:before {
     transform: translateX(14px);
+    background-color: white;
 }
 
 .linkContainer {
