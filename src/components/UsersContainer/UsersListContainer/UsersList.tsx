@@ -25,6 +25,8 @@ const UsersList: React.FC = () => {
     const [isMultiInviteVisible, setIsMultiInviteVisible] = useState(false);
     const [email, setEmail] = useState<string>('');
     const [multiEmails, setMultiEmails] = useState<string>('');
+    const [showInput, setShowInput] = useState(false);
+    const inviteLink = 'http://localhost:3000/auth/register';
 
     useEffect(() => {
         dispatch(userActions.fetchAllUsers({email: '', name: ''}));
@@ -116,6 +118,15 @@ const UsersList: React.FC = () => {
             });
     };
 
+    const handleToggle = () => {
+        setShowInput(prev => !prev);
+    };
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(inviteLink);
+        alert('Link copied to clipboard!');
+    };
+
     return (
         <div className={css.usersContainer}>
             <div className={css.headerContainer}>
@@ -163,8 +174,17 @@ const UsersList: React.FC = () => {
                     </div>
                     <div className={css.inviteContainer}>
                         <button className={css.inviteButton} onClick={handleInviteClick}>Invite</button>
-                        <p>Invite with Link</p>
+                        <p>Invite with Link <label className={css.switch}>
+                            <input type="checkbox" onChange={handleToggle}/>
+                            <span className={css.slider}></span>
+                        </label></p>
                     </div>
+                    {showInput && (
+                        <div className={css.linkContainer}>
+                            <input type="text" value={inviteLink} readOnly className={css.inviteLink} />
+                            <button className={css.copyButton} onClick={handleCopy}>Copy</button>
+                        </div>
+                    )}
                 </div>
             )}
             <ul className={css.userList}>
