@@ -242,6 +242,7 @@
 
 .multiEmailInput {
     width: 100%;
+    height: 80px;
     padding: 10px 10px 14px 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
@@ -249,6 +250,7 @@
     box-sizing: border-box;
     resize: vertical; /* Дозволяє змінювати розмір тільки по вертикалі */
     overflow-x: hidden;
+    margin-bottom: 0;
 }
 
 .multiEmailInput::placeholder {
