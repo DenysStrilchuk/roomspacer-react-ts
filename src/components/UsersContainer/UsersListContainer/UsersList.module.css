@@ -270,7 +270,6 @@
 }
 
 .inviteButton {
-    margin-top: 20px;
     background-color: rgb(240, 240, 242);
     color: rgb(171,173,179);
     border: none;
@@ -285,4 +284,16 @@
 .inviteButton:hover {
     background-color: rgb(171,173,179);
     color: rgb(240, 240, 242);
+}
+
+.inviteContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.inviteContainer {
+    font-size: 14px;
+    font-weight: bold;
 }

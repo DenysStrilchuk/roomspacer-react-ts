@@ -161,8 +161,9 @@ const UsersList: React.FC = () => {
                     <div className={css.divider}>
                         <span className={css.line}></span>
                     </div>
-                    <div>
+                    <div className={css.inviteContainer}>
                         <button className={css.inviteButton} onClick={handleInviteClick}>Invite</button>
+                        <p>Invite with Link</p>
                     </div>
                 </div>
             )}
