@@ -218,3 +218,24 @@
 .mailInput::placeholder {
     color: rgb(179, 181, 185);
 }
+
+.multiInviteText {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.multiEmailInput {
+    width: 100%;
+    padding: 10px 10px 14px 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    resize: vertical; /* Дозволяє змінювати розмір тільки по вертикалі */
+    overflow-x: hidden;
+}
+
+.multiEmailInput::placeholder {
+    color: rgb(171,173,179);
+    opacity: 1;
+}

@@ -1,26 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, {useEffect, useState} from 'react';
+import {useSelector} from 'react-redux';
 import css from './UsersList.module.css';
-import { useAppDispatch } from "../../../hooks";
-import { RootState } from "../../../store";
-import { userActions } from "../../../store/slices/userSlice";
+import {useAppDispatch} from "../../../hooks";
+import {RootState} from "../../../store";
+import {userActions} from "../../../store/slices/userSlice";
 import defaultAvatar from '../../../assets/defaultAvatar.png';
-import { IUser } from "../../../interfaces";
-import { userService } from "../../../services";
+import {IUser} from "../../../interfaces";
+import {userService} from "../../../services";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
 
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { users, error } = useSelector((state: RootState) => state.user);
+    const {users, error} = useSelector((state: RootState) => state.user);
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
-    const [usersStatus, setUsersStatus] = useState<Array<{ uid: string; email: string; online: boolean; lastOnline: Date | null }>>([]);
+    const [usersStatus, setUsersStatus] = useState<Array<{
+        uid: string;
+        email: string;
+        online: boolean;
+        lastOnline: Date | null
+    }>>([]);
     const [isWindowVisible, setIsWindowVisible] = useState(false);
+    const [isMultiInviteVisible, setIsMultiInviteVisible] = useState(false);
     const [email, setEmail] = useState<string>('');
+    const [multiEmails, setMultiEmails] = useState<string>('');
 
     useEffect(() => {
-        dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
+        dispatch(userActions.fetchAllUsers({email: '', name: ''}));
 
         const fetchUsersStatus = () => {
             userService.getUsersStatus()
@@ -52,10 +59,12 @@ const UsersList: React.FC = () => {
 
     const handleAddClick = () => {
         setIsWindowVisible(true);
+        setIsMultiInviteVisible(false); // показуємо початкову форму
     };
 
     const handleCloseModal = () => {
         setIsWindowVisible(false);
+        setIsMultiInviteVisible(false);
     };
 
     const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +89,33 @@ const UsersList: React.FC = () => {
             });
     };
 
+    const handleMultiInviteClick = () => {
+        setIsMultiInviteVisible(true);
+    };
+
+    const handleMultiEmailsChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setMultiEmails(event.target.value);
+    };
+
+    const handleInviteClick = () => {
+        const emailsArray = multiEmails.split(/[\s,]+/).filter(email => email.includes('@'));
+        if (emailsArray.length === 0) {
+            alert('Please enter at least one valid email address.');
+            return;
+        }
+
+        Promise.all(emailsArray.map(email => userService.inviteUserByEmail(email)))
+            .then(() => {
+                alert('Invitations sent successfully!');
+                setMultiEmails('');
+                setIsWindowVisible(false);
+            })
+            .catch(error => {
+                console.error('Error sending invitations:', error);
+                alert('Failed to send invitations. Please try again.');
+            });
+    };
+
     return (
         <div className={css.usersContainer}>
             <div className={css.headerContainer}>
@@ -90,17 +126,40 @@ const UsersList: React.FC = () => {
                 <div className={css.modalWindow}>
                     <div className={css.closeModalButton} onClick={handleCloseModal}>×</div>
                     <p className={css.inviteText}>Invite people to collaborate</p>
-                    <div className={css.inputContainer}>
-                        <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
-                        <input
-                            type="email"
-                            placeholder="e.g. name@mail.com"
-                            required
-                            value={email}
-                            onChange={handleEmailChange}
-                            className={css.mailInput}
-                        />
-                        <button className={css.addButtonInsideInput} onClick={handleAddEmailClick}>Add</button>
+                    {!isMultiInviteVisible ? (
+                        <>
+                            <div className={css.inputContainer}>
+                                <FontAwesomeIcon icon={faEnvelope} className={css.icon}/>
+                                <input
+                                    type="email"
+                                    placeholder="e.g. name@mail.com"
+                                    required
+                                    value={email}
+                                    onChange={handleEmailChange}
+                                    className={css.mailInput}
+                                />
+                                <button className={css.addButtonInsideInput} onClick={handleAddEmailClick}>Add</button>
+                            </div>
+                            <div className={css.multiInviteContainer}>
+                                <span className={css.staticText}>Big team?</span>
+                                <span className={css.multiInviteLink} onClick={handleMultiInviteClick}>
+                                        Add many people at once
+                                </span>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <p className={css.multiInviteText}>Invite people via email</p>
+                            <textarea
+                                placeholder="Separate by hitting comma or enter"
+                                value={multiEmails}
+                                onChange={handleMultiEmailsChange}
+                                className={css.multiEmailInput}
+                            />
+                        </>
+                    )}
+                    <div>
+                        <button className={css.inviteButton} onClick={handleInviteClick}>Invite</button>
                     </div>
                 </div>
             )}
@@ -139,4 +198,4 @@ const UsersList: React.FC = () => {
     );
 };
 
-export { UsersList };
+export {UsersList};
