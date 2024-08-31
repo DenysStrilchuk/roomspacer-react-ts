@@ -141,7 +141,7 @@ const UsersList: React.FC = () => {
                                 <button className={css.addButtonInsideInput} onClick={handleAddEmailClick}>Add</button>
                             </div>
                             <div className={css.multiInviteContainer}>
-                                <span className={css.staticText}>Big team?</span>
+                                <span className={css.staticText}>Big team? </span>
                                 <span className={css.multiInviteLink} onClick={handleMultiInviteClick}>
                                         Add many people at once
                                 </span>
@@ -158,6 +158,9 @@ const UsersList: React.FC = () => {
                             />
                         </>
                     )}
+                    <div className={css.divider}>
+                        <span className={css.line}></span>
+                    </div>
                     <div>
                         <button className={css.inviteButton} onClick={handleInviteClick}>Invite</button>
                     </div>
