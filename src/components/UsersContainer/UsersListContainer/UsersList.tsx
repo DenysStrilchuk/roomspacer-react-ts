@@ -8,7 +8,8 @@ import defaultAvatar from '../../../assets/defaultAvatar.png';
 import {IUser} from "../../../interfaces";
 import {userService} from "../../../services";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faEnvelope} from "@fortawesome/free-solid-svg-icons";
+import {faCopy, faEnvelope} from "@fortawesome/free-solid-svg-icons";
+
 
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -122,9 +123,14 @@ const UsersList: React.FC = () => {
         setShowInput(prev => !prev);
     };
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(inviteLink);
-        alert('Link copied to clipboard!');
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(inviteLink);
+            alert('Link copied to clipboard!');
+        } catch (error) {
+            console.error('Failed to copy the link:', error);
+            alert('Failed to copy the link. Please try again.');
+        }
     };
 
     return (
@@ -181,8 +187,17 @@ const UsersList: React.FC = () => {
                     </div>
                     {showInput && (
                         <div className={css.linkContainer}>
-                            <input type="text" value={inviteLink} readOnly className={css.inviteLink} />
-                            <button className={css.copyButton} onClick={handleCopy}>Copy</button>
+                            <div className={css.divider2}>
+                                <span className={css.line2}></span>
+                            </div>
+                            <div className={css.copyLinkContainer}>
+                                <FontAwesomeIcon icon={faCopy} className={css.icon}/>
+                                <input type="text"
+                                       value={inviteLink} readOnly
+                                       className={css.mailInput}
+                                />
+                                <button className={css.addButtonInsideInput} onClick={handleCopy}>Copy</button>
+                            </div>
                         </div>
                     )}
                 </div>
