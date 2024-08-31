@@ -20,15 +20,16 @@ axiosInstance.interceptors.response.use(
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                // Оновлюємо токен через Firebase
-                const newToken = await auth.currentUser?.getIdToken(true);
+                // Спроба оновити токен
+                const newToken = await refreshToken();
                 if (newToken) {
-                    setAuthToken(newToken);
                     originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
                     return axiosInstance(originalRequest);
                 }
             } catch (refreshError) {
                 console.error('Refresh token failed:', refreshError);
+                localStorage.removeItem('token');
+                localStorage.removeItem('refreshToken');
                 return Promise.reject(refreshError);
             }
         }
@@ -46,7 +47,7 @@ const setAuthToken = (token: string | null) => {
     }
 };
 
-const checkToken = async () => {
+const checkToken = async (): Promise<any>  => {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
@@ -64,15 +65,16 @@ const checkToken = async () => {
     } catch (error) {
         if (error instanceof AxiosError) {
             if (error.response && error.response.status === 401) {
-                console.error('Token is invalid or expired, logging out...');
-                localStorage.removeItem('token');
-                throw new Error('Unauthorized: Token is invalid or expired');
+                console.error('Token is invalid or expired, refreshing...');
+                const newToken = await refreshToken();
+                if (newToken) {
+                    return checkToken(); // Повторна спроба перевірки з новим токеном
+                }
             } else {
                 console.error('An error occurred:', error.message);
                 throw new Error('An unexpected error occurred');
             }
         } else {
-            // Якщо помилка не від Axios
             console.error('An unexpected error occurred:', (error as Error).message);
             throw new Error('An unexpected error occurred');
         }
@@ -90,6 +92,8 @@ const refreshToken = async (): Promise<string> => {
         throw new Error('Failed to refresh token');
     } catch (error) {
         console.error('Error refreshing token:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         throw error;
     }
 };
