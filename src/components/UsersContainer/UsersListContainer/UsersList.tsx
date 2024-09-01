@@ -213,6 +213,8 @@ const UsersList: React.FC = () => {
                                     className={css.avatar}
                                 />
                                 {getStatusDot(user.uid)}
+                            </div>
+                            <div className={css.userName}>
                                 <p>{user.name}</p>
                             </div>
                         </div>

@@ -29,6 +29,7 @@
 
 .userItem {
     display: flex;
+    flex-direction: column;
     align-items: center;
     margin-bottom: 10px;
     position: relative;
@@ -59,8 +60,8 @@
     height: 10px;
     background-color: rgb(70,77,97);
     border-radius: 50%;
-    top: 4px;
-    right: 24px;
+    top: 0;
+    right: 0;
     border: 2px solid white;
 }
 
