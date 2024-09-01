@@ -1,8 +1,10 @@
-import React, {useState} from "react";
-import {userService} from "../../../services";
+import React, { useState } from "react";
+import { userService } from "../../../services";
 import css from "./UsersInviteWindow.module.css";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCopy, faEnvelope} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCopy, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const UsersInviteWindow = () => {
     const [isWindowVisible, setIsWindowVisible] = useState(false);
@@ -14,7 +16,7 @@ const UsersInviteWindow = () => {
 
     const handleAddClick = () => {
         setIsWindowVisible(true);
-        setIsMultiInviteVisible(false); // показуємо початкову форму
+        setIsMultiInviteVisible(false);
     };
 
     const handleCloseModal = () => {
@@ -28,19 +30,19 @@ const UsersInviteWindow = () => {
 
     const handleAddEmailClick = () => {
         if (email.trim() === '') {
-            alert('Please enter a valid email address.');
+            toast.error('Please enter a valid email address.');
             return;
         }
 
         userService.inviteUserByEmail(email)
             .then(() => {
-                alert('Invitation sent successfully!');
+                toast.success('Invitation sent successfully!');
                 setEmail('');
                 setIsWindowVisible(false);
             })
             .catch(error => {
                 console.error('Error sending invitation:', error);
-                alert('Failed to send invitation. Please try again.');
+                toast.error('Failed to send invitation. Please try again.');
             });
     };
 
@@ -55,19 +57,19 @@ const UsersInviteWindow = () => {
     const handleInviteClick = () => {
         const emailsArray = multiEmails.split(/[\s,]+/).filter(email => email.includes('@'));
         if (emailsArray.length === 0) {
-            alert('Please enter at least one valid email address.');
+            toast.error('Please enter at least one valid email address.');
             return;
         }
 
         Promise.all(emailsArray.map(email => userService.inviteUserByEmail(email)))
             .then(() => {
-                alert('Invitations sent successfully!');
-                setMultiEmails(''); // очищуємо поле введення
-                setIsWindowVisible(false); // закриваємо модальне вікно
+                toast.success('Invitations sent successfully!');
+                setMultiEmails('');
+                setIsWindowVisible(false);
             })
             .catch(error => {
                 console.error('Error sending invitations:', error);
-                alert('Failed to send invitations. Please try again.');
+                toast.error('Failed to send invitations. Please try again.');
             });
     };
 
@@ -78,15 +80,16 @@ const UsersInviteWindow = () => {
     const handleCopy = async () => {
         try {
             await navigator.clipboard.writeText(inviteLink);
-            alert('Link copied to clipboard!');
+            toast.success('Link copied to clipboard!');
         } catch (error) {
             console.error('Failed to copy the link:', error);
-            alert('Failed to copy the link. Please try again.');
+            toast.error('Failed to copy the link. Please try again.');
         }
     };
 
     return (
         <div>
+            <ToastContainer />
             <button className={css.addButton} onClick={handleAddClick}>+</button>
             {isWindowVisible && (
                 <div className={css.modalWindow}>
@@ -155,4 +158,4 @@ const UsersInviteWindow = () => {
     );
 };
 
-export {UsersInviteWindow};
+export { UsersInviteWindow };

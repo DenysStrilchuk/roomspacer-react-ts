@@ -34,6 +34,7 @@
     "react-scripts": "5.0.1",
     "react-spinners": "^0.14.1",
     "react-switch": "^7.0.0",
+    "react-toastify": "^10.0.5",
     "star-rating-react-ts": "^1.1.4",
     "typescript": "^4.9.5"
   },
