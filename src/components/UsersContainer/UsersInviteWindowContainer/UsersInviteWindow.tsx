@@ -62,8 +62,8 @@ const UsersInviteWindow = () => {
         Promise.all(emailsArray.map(email => userService.inviteUserByEmail(email)))
             .then(() => {
                 alert('Invitations sent successfully!');
-                setMultiEmails('');
-                setIsWindowVisible(false);
+                setMultiEmails(''); // очищуємо поле введення
+                setIsWindowVisible(false); // закриваємо модальне вікно
             })
             .catch(error => {
                 console.error('Error sending invitations:', error);
