@@ -26,9 +26,11 @@ const Main = () => {
     return (
         <div className={css.mainContainer}>
             <UsersList />
-            <button onClick={handleLogout}>Logout</button>
+            <div>
+                <button onClick={handleLogout}>Logout</button>
+            </div>
         </div>
     );
 };
 
-export { Main };
+export {Main};
