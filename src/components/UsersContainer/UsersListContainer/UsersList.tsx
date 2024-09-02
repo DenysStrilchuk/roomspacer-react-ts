@@ -1,20 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {useSelector} from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import css from './UsersList.module.css';
-import {useAppDispatch} from "../../../hooks";
-import {RootState} from "../../../store";
-import {userActions} from "../../../store/slices/userSlice";
+import { useAppDispatch } from "../../../hooks";
+import { RootState } from "../../../store";
+import { userActions } from "../../../store/slices/userSlice";
 import defaultAvatar from '../../../assets/defaultAvatar.png';
-import {IUser} from "../../../interfaces";
-import {userService} from "../../../services";
-import {UsersInviteWindow} from "../UsersInviteWindowContainer";
-
+import { IUser } from "../../../interfaces";
+import { userService } from "../../../services";
+import { UsersInviteWindow } from "../UsersInviteWindowContainer";
+import { UsersInfo } from "../UsersInfoContainer"; // Переконайтеся, що шлях правильний
 
 const UsersList: React.FC = () => {
     const dispatch = useAppDispatch();
-    const {users, error} = useSelector((state: RootState) => state.user);
+    const { users, selectedUser, error } = useSelector((state: RootState) => state.user);
     const currentUser = useSelector((state: RootState) => state.auth.user);
-    const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
     const [usersStatus, setUsersStatus] = useState<Array<{
         uid: string;
         email: string;
@@ -23,7 +22,7 @@ const UsersList: React.FC = () => {
     }>>([]);
 
     useEffect(() => {
-        dispatch(userActions.fetchAllUsers({email: '', name: ''}));
+        dispatch(userActions.fetchAllUsers({ email: '', name: '' }));
 
         const fetchUsersStatus = () => {
             userService.getUsersStatus()
@@ -41,11 +40,7 @@ const UsersList: React.FC = () => {
     const filteredUsers = users.filter(user => user.uid !== currentUser?.uid);
 
     const handleUserClick = (user: IUser) => {
-        setSelectedUser(user);
-    };
-
-    const handleClose = () => {
-        setSelectedUser(null);
+        dispatch(userActions.setSelectedUser(user));
     };
 
     const getStatusDot = (uid: string) => {
@@ -53,13 +48,11 @@ const UsersList: React.FC = () => {
         return userStatus?.online ? <span className={css.onlineDot}></span> : null;
     };
 
-
-
     return (
         <div className={css.usersContainer}>
             <div className={css.headerContainer}>
                 <h3>People</h3>
-                <UsersInviteWindow/>
+                <UsersInviteWindow />
             </div>
 
             <ul className={css.userList}>
@@ -81,22 +74,9 @@ const UsersList: React.FC = () => {
                     </li>
                 ))}
             </ul>
-            {selectedUser && (
-                <div className={css.userDetails}>
-                    <button className={css.closeButton} onClick={handleClose}>×</button>
-                    <img
-                        src={selectedUser.picture || defaultAvatar}
-                        alt="User Avatar"
-                        className={css.userDetailsAvatar}
-                    />
-                    <h2>{selectedUser.name}</h2>
-                    <p className={css.label}>E-mail:</p>
-                    <p className={css.userEmail}>{selectedUser.email}</p>
-                    <p className={css.label}>Rooms:</p>
-                </div>
-            )}
+            {selectedUser && <UsersInfo />}
         </div>
     );
 };
 
-export {UsersList};
+export { UsersList };

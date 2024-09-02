@@ -7,19 +7,20 @@ interface IUserState {
     users: IUser[];
     loading: boolean;
     error: IErrorResponse | null;
+    selectedUser: IUser | null;
 }
 
 const initialState: IUserState = {
     users: [],
     loading: false,
     error: null,
+    selectedUser: null,
 };
 
 const handleAxiosError = (e: unknown): IErrorResponse => {
     const error = e as AxiosError<IErrorResponse>;
     return error.response?.data || { message: 'An error occurred' };
 };
-
 
 // Async thunk for fetching all users
 const fetchAllUsers = createAsyncThunk<
@@ -37,12 +38,17 @@ const fetchAllUsers = createAsyncThunk<
     }
 );
 
-
-
 const userSlice = createSlice({
     name: 'user',
     initialState,
-    reducers: {},
+    reducers: {
+        setSelectedUser: (state, action) => {
+            state.selectedUser = action.payload;
+        },
+        clearSelectedUser: (state) => {
+            state.selectedUser = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchAllUsers.pending, (state) => {
@@ -60,8 +66,9 @@ const userSlice = createSlice({
     },
 });
 
-const {reducer: userReducer} = userSlice;
+const {reducer: userReducer, actions} = userSlice;
 const userActions = {
+    ...actions,
     fetchAllUsers,
 };
 

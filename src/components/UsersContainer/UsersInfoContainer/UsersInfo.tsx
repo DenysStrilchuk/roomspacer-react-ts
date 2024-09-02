@@ -1,29 +1,35 @@
 import React from 'react';
-import css from './UsersInfo.module.css'; // Create and style this CSS module
+import { useSelector, useDispatch } from 'react-redux';
+import css from './UsersInfo.module.css';
+import defaultAvatar from '../../../assets/defaultAvatar.png';
+import { RootState } from "../../../store";
+import { userActions } from "../../../store/slices/userSlice";
 
-interface UsersInfoProps {
-    user: {
-        uid: string;
-        name: string;
-        email: string;
-        picture?: string;
-    } | null;
-    onClose: () => void;
-}
+const UsersInfo: React.FC = () => {
+    const dispatch = useDispatch();
+    const selectedUser = useSelector((state: RootState) => state.user.selectedUser);
 
-const UsersInfo: React.FC<UsersInfoProps> = ({ user, onClose }) => {
-    if (!user) return null;
+    if (!selectedUser) {
+        return null;
+    }
+
+    const handleClose = () => {
+        dispatch(userActions.clearSelectedUser());
+    };
 
     return (
-        <div className={css.usersInfoContainer}>
-            <div className={css.overlay} onClick={onClose}></div>
-            <div className={css.userInfoCard}>
-                <button className={css.closeButton} onClick={onClose}>X</button>
-                <img src={user.picture || '/path-to-default-avatar'} alt="User Avatar" className={css.avatar} />
-                <h3>{user.name}</h3>
-                <p>{user.email}</p>
-                {/* Add more user info as needed */}
-            </div>
+        <div className={css.userDetails}>
+            <button className={css.closeButton} onClick={handleClose}>×</button>
+            <img
+                src={selectedUser.picture || defaultAvatar}
+                alt="User Avatar"
+                className={css.userDetailsAvatar}
+            />
+            <h2>{selectedUser.name}</h2>
+            <p className={css.label}>E-mail:</p>
+            <p className={css.userEmail}>{selectedUser.email}</p>
+            <p className={css.label}>Rooms:</p>
+            {/* Додайте додаткові дані користувача тут */}
         </div>
     );
 };
